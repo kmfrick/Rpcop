@@ -6,7 +6,7 @@
 
 #include <cstdlib>
 
-
+#define PI M_PI
 
 
 espai::espai(ll_p *ll_punts,int d,int p){
@@ -862,7 +862,7 @@ double espai::finalitzacio(){
 
 	/* GTV:: gloval total variance */
 
-	printf("var_PC: %f ;  var_res: %f \n", Var_PC, Var_res);
+	//printf("var_PC: %f ;  var_res: %f \n", Var_PC, Var_res);
 	return( Var_PC + Var_res);  // GTV
 
 }
@@ -871,7 +871,7 @@ void  espai::obtenir_data(double* result, int* ncol, int* nrow){
 
 	int i;
 	*ncol = Dim * 2 + 5;
-	*nrow = 0;
+	(*nrow) = 0;
 	ll_pnt *sll_pop;
 	espai *sespai;
 	double *auxa;
@@ -879,8 +879,17 @@ void  espai::obtenir_data(double* result, int* ncol, int* nrow){
 	void *pt,*pt2;
 
 	ll_pop->resetpt(&pt);
+	if (pt == NULL) {
+		Rcpp::stop("pt is null.\n");
+	}
 	while(ll_pop->noend(pt)){
+		if (result == NULL) {
+			Rcpp::stop("result is null.\n");
+		}
 		*(result++) = 0;
+		if (result == NULL) {
+			Rcpp::stop("result is null.\n");
+		}
 		*(result++) = ((pop *)ll_pop->llpt(pt))->I;
 		*(result++) = ((pop *)ll_pop->llpt(pt))->density;
 		*(result++) = ((pop *)ll_pop->llpt(pt))->span;
@@ -890,7 +899,7 @@ void  espai::obtenir_data(double* result, int* ncol, int* nrow){
 			*(result++) = ((pop *)ll_pop->llpt(pt))->alpha[i];
 		for (i =0;i<Dim;i++) 
 			*(result++) = ((pop *)ll_pop->llpt(pt))->b_ast[i];
-		*nrow++;
+		(*nrow)++;
 
 		sespai = ((pop *)ll_pop->llpt(pt))->espai;
 		sll_pop = sespai->ll_pop;
@@ -913,17 +922,17 @@ void  espai::obtenir_data(double* result, int* ncol, int* nrow){
 				for (i =0;i<Dim;i++) 
 					*(result++) = auxb[i];
 
-				*nrow++;
+				(*nrow)++;
 				delete auxb; delete auxa;
 
 				sll_pop->advpt(&pt2);
 
 			}
 			*(result++) = 1;
-			*(result++) = ((pop *)sll_pop->llpt(pt2))->I
-				*(result++) =((pop *)sll_pop->llpt(pt2))->density;
-			*(result++) =((pop *)sll_pop->llpt(pt2))->span;
-			*(result++) =((pop *)sll_pop->llpt(pt2))->var_k;
+			*(result++) = ((pop *)sll_pop->llpt(pt2))->I;
+			*(result++) = ((pop *)sll_pop->llpt(pt2))->density;
+			*(result++) = ((pop *)sll_pop->llpt(pt2))->span;
+			*(result++) = ((pop *)sll_pop->llpt(pt2))->var_k;
 
 			auxb = sespai->Ma->aplicar_Ma_vect(((pop *)sll_pop->llpt(pt2))->b_ast);
 			auxa = sespai->Ma->aplicar_Ma_punt(((pop *)sll_pop->llpt(pt2))->alpha); 
@@ -931,7 +940,7 @@ void  espai::obtenir_data(double* result, int* ncol, int* nrow){
 				*(result++) = auxa[i];
 			for (i =0;i<Dim;i++)
 				*(result++) = auxb[i];
-			*nrow++;
+			(*nrow)++;
 		}
 		// end subspai
 
@@ -949,7 +958,7 @@ void  espai::obtenir_data(double* result, int* ncol, int* nrow){
 	for (i =0;i<Dim;i++) 
 		*(result++) = ((pop *)ll_pop->llpt(pt))->b_ast[i];
 
-	*nrow++;
+	(*nrow)++;
 
 }
 

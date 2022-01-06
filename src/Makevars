@@ -1,0 +1,2 @@
+PKG_CXXFLAGS=-O0 -ggdb 
+PKG_LIBS=-O0 -ggdb 
