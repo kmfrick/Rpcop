@@ -1,24 +1,24 @@
 class pila{
 
 
-  private:
+	private:
 
-	 typedef struct node{
-		 void *pt;
-		 node *seg;
-	 };
-	 node *top;
-     node *n_top;
-	 
-  public:
+		typedef struct node{
+			void *pt;
+			node *seg;
+		} node;
+		node *top;
+		node *n_top;
 
-//  constructora
-	pila();
-	void apilar(void *pt);
-	void *desapilar();
+	public:
 
-// consultora
-	int pila_buida();
+		//  constructora
+		pila();
+		void apilar(void *pt);
+		void *desapilar();
+
+		// consultora
+		int pila_buida();
 
 };
 

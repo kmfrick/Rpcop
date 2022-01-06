@@ -1,31 +1,34 @@
+
+extern "C" {
 #include <stdlib.h>
 #include <stdio.h>
+}
 
 #define CQ 3 // constante para definir dmax a prtir del rango intercuartilico
 
 class ll_q{
- private :
+	private :
 
- typedef struct node{
-	float info;
-	node  *seg;
- };
+		typedef struct node{
+			double info;
+			node  *seg;
+		} node;
 
- int npunts;
+		int npunts;
 
- node *Topleft;
- node *newTopright;
- node *Topright;
+		node *Topleft;
+		node *newTopright;
+		node *Topright;
 
- public :
+	public :
 
- // constructoras
- ll_q(int np);
- ~ll_q();
- void add_ord(float info);
+		// constructoras
+		ll_q(int np);
+		~ll_q();
+		void add_ord(double info);
 
- // consultoras
- 
- float dmax();
+		// consultoras
+
+		double dmax();
 
 };

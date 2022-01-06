@@ -4,6 +4,8 @@
 
 #include "espai.h"
 
+#include <cstdlib>
+
 
 
 
@@ -38,8 +40,8 @@ espai::~espai(){
 	delete ll_pop;
 }
 
-float espai::obtenir_VTG(float **xm){
-	float l;
+double espai::obtenir_VTG(double **xm){
+	double l;
 	char c; //###
 
 	if ((profundidad == PROF_REQ)||(Dim==1)||(ll_pt->n_punts()< NPTMIN*Dim)){  //falta verificacio de que son prou punts tenint en compte la dim
@@ -77,10 +79,10 @@ float espai::obtenir_VTG(float **xm){
 
 espai  *espai::obtenir_cluster(M_b *Mb,m_d_s *mds){
 	int   validacio = 1;
-	float *v_pnt;
-	float *n_pnt = NULL;
+	double *v_pnt;
+	double *n_pnt = NULL;
 	ll_p  *n_ll_pt;
-	float  sum_w,w;
+	double  sum_w,w;
 	char c;//###
 	int i; //file output
 
@@ -138,7 +140,7 @@ espai  *espai::obtenir_cluster(M_b *Mb,m_d_s *mds){
 		}
 
 		/* calcul final de densitats */
-		mds->span    =  (float)n_ll_pt->n_punts()/(float)ll_pt->n_punts();
+		mds->span    =  (double)n_ll_pt->n_punts()/(double)ll_pt->n_punts();
 		mds->density =  sum_w/(ll_pt->n_punts()*h_tail);
 
 		return (new espai(n_ll_pt,Dim-1,profundidad+1));
@@ -150,12 +152,12 @@ espai  *espai::obtenir_cluster(M_b *Mb,m_d_s *mds){
 	}
 }
 
-int espai::dist_al_pla(float *n_punt){   // comproba si el punt es a distancia h_tail del pla
+int espai::dist_al_pla(double *n_punt){   // comproba si el punt es a distancia h_tail del pla
 	return (fabs(n_punt[X]) < h_tail);
 }
 
-float *espai::treure_coord(float *n_pnt){  // fem la projeccio sobre el pla per pasar al subespai de dimensio inferior
-	return n_pnt+1;       // el float de memoria que es deja lo borra la ll_p al borrar los puntos, tb se utiliza para obtenir_STV;
+double *espai::treure_coord(double *n_pnt){  // fem la projeccio sobre el pla per pasar al subespai de dimensio inferior
+	return n_pnt+1;       // el double de memoria que es deja lo borra la ll_p al borrar los puntos, tb se utiliza para obtenir_STV;
 }
 
 
@@ -164,8 +166,8 @@ void espai::rebre_M_a(M_a *n_Ma){ // pasarem el M_a al subespai inferior despres
 }
 
 
-int espai::fi_corba(float *v_pnt){
-	float *Mba_pnt;
+int espai::fi_corba(double *v_pnt){
+	double *Mba_pnt;
 	if (bficorba) {
 		Mba_pnt =optims.Mb_ant->aplicar(v_pnt);  
 		if (Mba_pnt[X]>2*delta) bficorba = FALSE;	//### h_tail subst. 2*delta 	
@@ -176,10 +178,10 @@ int espai::fi_corba(float *v_pnt){
 }
 
 
-int espai::no_creua_corba(float *ncand){
+int espai::no_creua_corba(double *ncand){
 	// els creuaments estarán en funció del delta. Amb un menor delta tindrem més presició a tant l'hora de definir la corba com de finalitzar-la.
 	void *pt;
-	float *punt;
+	double *punt;
 
 	ll_pop->resetpt(&pt);
 	while(ll_pop->noend(pt)){
@@ -193,9 +195,9 @@ int espai::no_creua_corba(float *ncand){
 }
 
 
-void espai::calcular_Mb(int ejegir,M_b *Mb,float porcion_pinza){
+void espai::calcular_Mb(int ejegir,M_b *Mb,double porcion_pinza){
 	int i;       /* el ejegir controla el punto fijo, porcion_pinza no variara en las llamadas recursivas */
-	float VTG;
+	double VTG;
 	m_d_s mds;
 	espai *espai;
 	char c; //###
@@ -248,21 +250,21 @@ void espai::calcular_Mb(int ejegir,M_b *Mb,float porcion_pinza){
 
 
 
-float espai::calcular_corba_en_un_sentit(){
+double espai::calcular_corba_en_un_sentit(){
 	// nomes es diferencia de la funcio calcular_corba_en_sentit_contrari per la
 	//inicialitzacio i per la crida a la insercio de elements a les llistes de
 	//sortida, add() vs addrev().  Els vectors de b_ast estarán orientats segons 
 	//el eigenvector, i las distancies de I serán negatives i positives als dos costats de xomig.
 
 	pop   *n_pop;
-	float pinza;
-	float *n_bo,*b_opt;
-	float *v_xact2xm = NULL;
-	float *v_xant2xm = NULL;
+	double pinza;
+	double *n_bo,*b_opt;
+	double *v_xact2xm = NULL;
+	double *v_xant2xm = NULL;
 	int   naux_delta;
-	float sum;
-	float lambda;
-	float alfa;
+	double sum;
+	double lambda;
+	double alfa;
 	//  char c; //###
 	//  int i; //file output
 
@@ -273,9 +275,9 @@ float espai::calcular_corba_en_un_sentit(){
 
 	/* calcul htail y delta */
 
-	lambda = suma_d/(pow(ll_pt->n_punts(),((float)(Dim-1))/Dim)*Bmst())*
-		pow(((float)(Dim-1))/(1-((1-LD)*alfa+LD)),((float)(Dim-1))/(2*Dim))*
-		(1/sqrt(2*PI))* pow(((float)(Dim-1))/Dim,Dim/2.);
+	lambda = suma_d/(pow(ll_pt->n_punts(),((double)(Dim-1))/Dim)*Bmst())*
+		pow(((double)(Dim-1))/(1-((1-LD)*alfa+LD)),((double)(Dim-1))/(2*Dim))*
+		(1/sqrt(2*PI))* pow(((double)(Dim-1))/Dim,Dim/2.);
 
 	h_tail = C_H * 2.214 * pow(4./3,1./5)*lambda*pow(ll_pt->n_punts(),-1./5); // el 2.214 viene de pasar de kernel normal a Epanechnikov
 	delta = C_D*h_tail;     // siempre será menor que el h_tail. De esta forma el nuevo xo ha de estar a distancia dmax de un punto de ll_p.
@@ -291,8 +293,8 @@ float espai::calcular_corba_en_un_sentit(){
 
 	optims.espai = NULL;
 	xo.act = NULL;
-	optims.mds.xmean = (float *) malloc(Dim*sizeof(float));
-	memmove(optims.mds.xmean,xomig, Dim*sizeof(float)); // ?el xomig passat el necesita la clase llp?.
+	optims.mds.xmean = (double *) malloc(Dim*sizeof(double));
+	memmove(optims.mds.xmean,xomig, Dim*sizeof(double)); // ?el xomig passat el necesita la clase llp?.
 	do {
 		delete optims.espai;
 		delete v_xact2xm;
@@ -449,17 +451,17 @@ float espai::calcular_corba_en_un_sentit(){
 }
 
 
-float espai::calcular_corba_en_sentit_contrari(){
+double espai::calcular_corba_en_sentit_contrari(){
 	// nomes es diferencia de l'anterior funcio per la inicialitzacio i per la crida
 	// a la insercio de elements a les llistes de sortida, addrev(). Els vectors de b_ast.
 	// estarán orientats segons el eigenvector, i las distancies de I serán negatives.
 	pop   *n_pop;
-	float  pinza;
-	float *n_bo,*b_opt;
-	float *v_xact2xm = NULL;
-	float *v_xant2xm = NULL;
+	double  pinza;
+	double *n_bo,*b_opt;
+	double *v_xact2xm = NULL;
+	double *v_xant2xm = NULL;
 	int    naux_delta;
-	float  sum = 0;
+	double  sum = 0;
 	void  *pt;
 	int i;
 	char c; //###  
@@ -471,8 +473,8 @@ float espai::calcular_corba_en_sentit_contrari(){
 	optims.Mb = new M_b(Dim,mult_esc(-1,((pop *)ll_pop->llpt(pt))->b_ast)); // fara el paper de matriu del ppp del pas anterior
 	optims.Mb_ant = optims.Mb->replicar(); 
 	optims.Mb_ant->calcular_la_inversa();
-	xo.ant = (float *)malloc(Dim*sizeof(float));  
-	memmove(xo.ant,xomig,Dim*sizeof(float)); // no podem borrar un element contingut a alpha, pero el necesitem el valor per calcular la distancia al nou pop.
+	xo.ant = (double *)malloc(Dim*sizeof(double));  
+	memmove(xo.ant,xomig,Dim*sizeof(double)); // no podem borrar un element contingut a alpha, pero el necesitem el valor per calcular la distancia al nou pop.
 	optims.Mb_ant->rebre_xo(xo.ant);
 
 	/* avançar cluster */
@@ -579,15 +581,15 @@ float espai::calcular_corba_en_sentit_contrari(){
 	return (sum);   // exit per quan hi ha un creuament amb la propia corba
 }
 
-float *espai::allargar(float *b_opt){
+double *espai::allargar(double *b_opt){
 	int i;
-	float *n_b;
-	n_b = (float *) malloc((Dim+profundidad)*sizeof(float));
+	double *n_b;
+	n_b = (double *) malloc((Dim+profundidad)*sizeof(double));
 
 	for(i=0;i<profundidad;i++)
 		n_b[i]=0.0;
 
-	memmove(n_b+profundidad,b_opt,Dim*sizeof(float)); //### sense testar 
+	memmove(n_b+profundidad,b_opt,Dim*sizeof(double)); //### sense testar 
 
 	//	  for(i=profundidad;i<Dim+profundidad;i++)
 	//	 		n_b[i]=b_opt[i-profundidad];
@@ -595,27 +597,27 @@ float *espai::allargar(float *b_opt){
 	return n_b+profundidad;
 }
 
-float *espai::obtenir_bo_inicial(float *alfa){
+double *espai::obtenir_bo_inicial(double *alfa){
 
-	float **S = (float **) malloc(Dim*sizeof(float *));
-	float *A = (float *) malloc(Dim*(Dim+1)/2*sizeof(float));
-	float *EV = (float *) calloc(Dim*Dim,sizeof(float));
-	float *E = (float *) malloc(Dim*sizeof(float)); 
-	float *b_op = (float *) malloc(Dim*sizeof(float));
+	double **S = (double **) malloc(Dim*sizeof(double *));
+	double *A = (double *) malloc(Dim*(Dim+1)/2*sizeof(double));
+	double *EV = (double *) calloc(Dim*Dim,sizeof(double));
+	double *E = (double *) malloc(Dim*sizeof(double)); 
+	double *b_op = (double *) malloc(Dim*sizeof(double));
 	void *pt;
-	float *punt;
-	float *m = (float *) calloc(Dim,sizeof(float));
+	double *punt;
+	double *m = (double *) calloc(Dim,sizeof(double));
 	int np = ll_pt->n_punts();
 	int i,j;
-	float VarTot;
+	double VarTot;
 
-	for (i=0;i< Dim;i++) S[i] = (float *) calloc(Dim,sizeof(float)); 
+	for (i=0;i< Dim;i++) S[i] = (double *) calloc(Dim,sizeof(double)); 
 
 	for(i=0;i< Dim;i++){
 		/* calculem l'element de la diagonal */
 		ll_pt->resetpt(&pt); 
 		while(ll_pt->noend(pt)){
-			punt = ((float *)ll_pt->llpt(pt));
+			punt = ((double *)ll_pt->llpt(pt));
 			m[i] += punt[i];
 			S[i][i]+= pow(punt[i],2); // xomig será la mitja de tots els punts per cada  coordenada.
 			ll_pt->advpt(&pt);
@@ -625,7 +627,7 @@ float *espai::obtenir_bo_inicial(float *alfa){
 		for(j=0;j< i;j++){
 			ll_pt->resetpt(&pt); 
 			while(ll_pt->noend(pt)){
-				punt = (float *)ll_pt->llpt(pt);
+				punt = (double *)ll_pt->llpt(pt);
 				S[i][j]+= punt[i] * punt[j]; // xomig será la mitja de tots els punts per cada  coordenada.
 				ll_pt->advpt(&pt);
 			}
@@ -656,8 +658,8 @@ float *espai::obtenir_bo_inicial(float *alfa){
 	return b_op;	  
 }
 
-float espai::Bmst(){
-	float cd,lbeta,ubeta,S,fact;
+double espai::Bmst(){
+	double cd,lbeta,ubeta,S,fact;
 	double par_f,res;
 	int i;
 
@@ -680,7 +682,7 @@ float espai::Bmst(){
 	return res;
 }
 
-float espai::gammln(float xx){
+double espai::gammln(double xx){
 	double x,y,tmp,ser;
 	static double cof[6]={76.18009172947146,-86.50532032941677,
 		24.01409824083091,-1.231739572450155,
@@ -696,20 +698,20 @@ float espai::gammln(float xx){
 
 
 
-float espai::obtenir_STV(){
+double espai::obtenir_STV(){
 	// en caso de calcular la stv por no poder generar la curva,
 	// el xomig es el punto central de la curva.  
 
 	int j;
 	void *pt;
-	float *punt;
-	float *c_xomig;
-	float sum_w = 0.0;
-	float stv=0.0;  
+	double *punt;
+	double *c_xomig;
+	double sum_w = 0.0;
+	double stv=0.0;  
 
-	c_xomig = (float *) malloc((Dim+1)*sizeof(float));
+	c_xomig = (double *) malloc((Dim+1)*sizeof(double));
 	c_xomig[0] = 0;c_xomig++;     // necesari si es un espai final i l'hem de pasar al espai superior.
-	memmove(c_xomig,xomig, Dim*sizeof(float));
+	memmove(c_xomig,xomig, Dim*sizeof(double));
 	free(xomig);xomig = c_xomig;
 
 	ll_pt->resetpt(&pt);
@@ -726,8 +728,8 @@ float espai::obtenir_STV(){
 
 
 void espai::calcular_htail_delta_xomig_epsx(){
-	float *range, *min,*max;
-	float  sum,length;
+	double *range, *min,*max;
+	double  sum,length;
 	int i;
 
 	ll_pt->donar_max_min_xomig(&max,&min,&xomig,&suma_d);
@@ -740,25 +742,25 @@ void espai::calcular_htail_delta_xomig_epsx(){
 	free (min);
 }
 
-float espai::kernel(float d){   
+double espai::kernel(double d){   
 	return (0.75*(1- pow(d,2)));
 }
 
-int espai::major(float *v1,float *v2){
+int espai::major(double *v1,double *v2){
 	int i=0;
 
 	while (i<Dim && fabs(v1[i])<=fabs(v2[i])) i++;  //major o igual
 	return (i != Dim);
 }
 
-float espai::finalitzacio(){
+double espai::finalitzacio(){
 
 	ll_flt   w_s;	
 	void *pt,*ptant;
 	void *ptws;
-	float *xomig_0,*xomig_1;
-	float Iant,I2ant,dant,wsact;
-	float sum = 0;  
+	double *xomig_0,*xomig_1;
+	double Iant,I2ant,dant,wsact;
+	double sum = 0;  
 
 	/*  w_s  ::  ws(n) = (I(n+1)-I(n-1))*density(n) */
 
@@ -832,7 +834,7 @@ float espai::finalitzacio(){
 	/*asignacio del pop centre de la corba que es pasa a l'espai superior */
 
 	//free (xomig) ; no el borrem, conte un pop de ll_pop->
-	xomig = (float *)malloc((Dim+1)*sizeof(float));
+	xomig = (double *)malloc((Dim+1)*sizeof(double));
 	xomig[0] =0;xomig++;
 	if (!((pop *)ll_pop->llpt(pt))->I) {
 		xomig = mult_esc(((pop *)ll_pop->llpt(pt))->I,
@@ -847,7 +849,7 @@ float espai::finalitzacio(){
 				,xomig_1);     // xomig que es pasa al espai superior.
 		delete xomig_1;
 	}    
-	else memmove(xomig,((pop *)ll_pop->llpt(pt))->alpha,Dim*sizeof(float));
+	else memmove(xomig,((pop *)ll_pop->llpt(pt))->alpha,Dim*sizeof(double));
 
 	ll_pop->advpt(&pt);w_s.advpt(&ptws);
 	while (w_s.noend(ptws)){
@@ -865,15 +867,15 @@ float espai::finalitzacio(){
 
 }
 
-void  espai::obtenir_data(float* result, int* ncol, int* nrow){
+void  espai::obtenir_data(double* result, int* ncol, int* nrow){
 
 	int i;
 	*ncol = Dim * 2 + 5;
 	*nrow = 0;
 	ll_pnt *sll_pop;
 	espai *sespai;
-	float *auxa;
-	float *auxb;
+	double *auxa;
+	double *auxb;
 	void *pt,*pt2;
 
 	ll_pop->resetpt(&pt);
@@ -956,10 +958,10 @@ void  espai::obtenir_data(float* result, int* ncol, int* nrow){
 // modificado 16/4/2002 inicializamos las variables
 int espai :: PROF_REQ;
 int espai :: NPARTS;
-float espai :: C_H;
-float espai :: C_D;
+double espai :: C_H;
+double espai :: C_D;
 
-void espai::inicializar_nparts_ch_cd(int profreq,int nparts,float c_h,float c_d)
+void espai::inicializar_nparts_ch_cd(int profreq,int nparts,double c_h,double c_d)
 {
 	if(profreq<=0) PROF_REQ=1;
 	else PROF_REQ=profreq;
@@ -1022,7 +1024,7 @@ void espai::inicializar_nparts_ch_cd(int profreq,int nparts,float c_h,float c_d)
    Copyleft version.
  */
 
-void espai::eigens(float *A,float *RR,float *E,int N )
+void espai::eigens(double *A,double *RR,double *E,int N )
 	//double A[], RR[], E[];
 	//int N;
 {
@@ -1154,26 +1156,26 @@ done:	;
 
 // ops vect /////////////////
 
-float  espai::distancia(float *pnt1,float *pnt2){
+double  espai::distancia(double *pnt1,double *pnt2){
 	int i;
-	float sum=0.0;
+	double sum=0.0;
 	for(i =0;i<Dim;i++)
 		sum += pow(pnt1[i]-pnt2[i],2);
 	return sqrt(sum);
 }
 
-float *espai::mult_esc(float e,float *v){
+double *espai::mult_esc(double e,double *v){
 	int i;
-	float *v3;
+	double *v3;
 
-	v3 = (float *)malloc(Dim* sizeof(float));
+	v3 = (double *)malloc(Dim* sizeof(double));
 	for(i=0;i<Dim;i++)  v3[i] = v[i]*e;
 	return v3;
 }
 
-float espai::mult_v(float *v1,float *v2){
+double espai::mult_v(double *v1,double *v2){
 	int i;
-	float sum = 0.0;
+	double sum = 0.0;
 	for(i=0;i<Dim;i++){
 		sum += v1[i]* v2[i];
 	}
@@ -1181,32 +1183,32 @@ float espai::mult_v(float *v1,float *v2){
 }
 
 
-float *espai::sum_v (float *v1,float *v2){
+double *espai::sum_v (double *v1,double *v2){
 	int i;
-	float *v3;
+	double *v3;
 
-	v3 = (float *)malloc(Dim* sizeof(float));
+	v3 = (double *)malloc(Dim* sizeof(double));
 	for(i=0;i<Dim;i++)  v3[i] = v1[i]+v2[i];
 	return v3;
 }
 
 
-float *espai::dif_v (float *v2,float *v1){
+double *espai::dif_v (double *v2,double *v1){
 	int i;
-	float *v3;
+	double *v3;
 
-	v3 = (float *)malloc(Dim* sizeof(float));
+	v3 = (double *)malloc(Dim* sizeof(double));
 	for(i=0;i<Dim;i++)  v3[i] = v2[i]-v1[i];
 	return v3;
 }
 
-float *espai::norma_v(float *v){
+double *espai::norma_v(double *v){
 	// devuelve el vector normalizado
 	int i;
-	float nrm =0.0;
-	float *v3;
+	double nrm =0.0;
+	double *v3;
 
-	v3 = (float *)malloc(Dim* sizeof(float));
+	v3 = (double *)malloc(Dim* sizeof(double));
 	for(i=0;i<Dim;i++)  nrm += pow(v[i],2);
 	nrm = sqrt(nrm);
 	for(i=0;i<Dim;i++)  v3[i] = v[i]/nrm;

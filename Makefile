@@ -1,6 +1,6 @@
 SHELL = /bin/sh
 
-SRCS = espai_rba_f.cpp fileops.cpp ll_flt.cpp ll_p.cpp ll_pnt.cpp ll_q.cpp ma.cpp main.cpp mb.cpp pila.cpp
+SRCS = espai_rba_f.cpp  ll_flt.cpp ll_p.cpp ll_pnt.cpp ll_q.cpp ma.cpp main.cpp mb.cpp pila.cpp
 OBJS=$(subst .cc,.o,$(SRCS))
 
 CXXFLAG = -Wall -g
@@ -13,3 +13,4 @@ pcop: $(OBJS)
 
 %.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
+

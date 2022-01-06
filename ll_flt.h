@@ -1,34 +1,34 @@
 class ll_flt{
 
- private :
+	private :
 
- typedef struct node{
-	float info;
-	node  *seg;
- };
+		typedef struct node{
+			double info;
+			node  *seg;
+		} node;
 
- node *Topleft;
- node *newTopleft;
- node *Topright;
+		node *Topleft;
+		node *newTopleft;
+		node *Topright;
 
- public :
+	public :
 
- // constructoras
- ll_flt();
- ~ll_flt();
- void add(float info);
- void addrev(float info);
+		// constructoras
+		ll_flt();
+		~ll_flt();
+		void add(double info);
+		void addrev(double info);
 
 
- // consultoras
+		// consultoras
 
- void resetpt(void **pt);
- void *noend(void *pt);
- float llpt(void *pt);
- void advpt(void **pt);
+		void resetpt(void **pt);
+		void *noend(void *pt);
+		double llpt(void *pt);
+		void advpt(void **pt);
 
- // modificadoras
+		// modificadoras
 
- void modpt(void *pt,float inf);
+		void modpt(void *pt,double inf);
 
- };
+};

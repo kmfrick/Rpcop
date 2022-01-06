@@ -1,4 +1,7 @@
 #include "ll_q.h"
+extern "C" {
+#include <stdlib.h>
+}
 
 
 ll_q::ll_q(int np){
@@ -17,12 +20,12 @@ ll_q::~ll_q(){
 	}
 }
 
-void ll_q::add_ord(float info){
+void ll_q::add_ord(double info){
 	node *pt=Topleft;
 	node *newpt;
 
 	while(pt->seg && pt->seg->info> info){
-		  pt = pt->seg;
+		pt = pt->seg;
 	}
 	newpt = (node *) malloc(sizeof(node));
 	newpt->info = info;
@@ -31,7 +34,7 @@ void ll_q::add_ord(float info){
 
 }
 
-float ll_q::dmax(){
+double ll_q::dmax(){
 	int limite,i;
 	node  *nd;
 
