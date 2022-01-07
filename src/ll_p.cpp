@@ -13,10 +13,10 @@ ll_p::ll_p(int d){
 	suma_d = 0;
 
 	topleft = (node *) malloc(sizeof(node));
-	topleft->coord = (double *) calloc(Dim+1,sizeof(double));topleft->coord++;
+	topleft->coord = (float *) calloc(Dim+1,sizeof(float));topleft->coord++;
 	topleft->coord[X] = -1*INF; 
 	topright = (node *) malloc(sizeof(node));
-	topright->coord = (double *) calloc(Dim+1,sizeof(double));topright->coord++; // Dim +1 para incluir los pesos
+	topright->coord = (float *) calloc(Dim+1,sizeof(float));topright->coord++; // Dim +1 para incluir los pesos
 	topright->coord[X] = INF; 
 
 
@@ -34,11 +34,11 @@ ll_p::ll_p(int d){
 	topright->marca = -1; // marca de ja insertats al spanning tree
 	topleft->marca = -1;
 	vn_punts = 0;
-	max = (double *) malloc(Dim*sizeof(double));
+	max = (float *) malloc(Dim*sizeof(float));
 	for(i=0;i<Dim;i++) max[i] = -1*INF; 
-	min = (double *) malloc(Dim*sizeof(double));
+	min = (float *) malloc(Dim*sizeof(float));
 	for(i=0;i<Dim;i++) min[i] = INF; 
-	x_mean = (double *) calloc(Dim,sizeof(double));  //si es una llista de un espai de prof 0, es calculara l'xmean,
+	x_mean = (float *) calloc(Dim,sizeof(float));  //si es una llista de un espai de prof 0, es calculara l'xmean,
 	//sino, sera l'origen de coordenades, equivalent al ppp del espai superior.   
 }
 
@@ -79,9 +79,9 @@ ll_p::~ll_p(){
 }
 
 
-void ll_p::add_ordX_principal(double *vect){
+void ll_p::add_ordX_principal(float *vect){
 	node *act_node,*new_node;
-	double *x_mean02,*x_mean03;
+	float *x_mean02,*x_mean03;
 
 	int i;
 
@@ -140,7 +140,7 @@ void ll_p::add_ordX_principal(double *vect){
 
 }
 
-void ll_p::donar_max_min_xomig(double **mx, double **mn, double **xm,double *s_d){
+void ll_p::donar_max_min_xomig(float **mx, float **mn, float **xm,float *s_d){
 
 	*mx = max;
 	*mn = min;
@@ -208,9 +208,9 @@ void ll_p::calcular_max_min_cluster(){
 }
 
 
-double ll_p::inicialitzacio_principal(){
+float ll_p::inicialitzacio_principal(){
 	ll_q *quartiles;
-	double *auxx_mean;
+	float *auxx_mean;
 
 	auxx_mean = x_mean;       // x_mean teoric.
 	x_mean = mult_esc(1.0/sum_w,auxx_mean);
@@ -225,7 +225,7 @@ double ll_p::inicialitzacio_principal(){
 
 void ll_p::inicialitzacio_final(){
 	/* no fem ni spanning tree, ni satelits, donç no calcularem cap corba per aquest spai */
-	double *auxx_mean;
+	float *auxx_mean;
 
 	auxx_mean = x_mean;       // x_mean teoric.
 	x_mean = mult_esc(1.0/sum_w,auxx_mean);  //el xmean el dividim per la suma de pesos dels punts.
@@ -256,7 +256,7 @@ void ll_p::obtener_quartiles(ll_q *llqt){  // calculamos el minium spanning tree
 	node  *xpost;
 	node  *xpt;
 	node  *nxtnomstin; 
-	double dpost,dant,d; /* dant : distancia min. a un nodo del tree */
+	float dpost,dant,d; /* dant : distancia min. a un nodo del tree */
 	/* dpost: distancia min. a un nodo fuera del tree */
 	xpt = topleft->seg[DRETA];
 
@@ -385,8 +385,8 @@ void ll_p::obtener_quartiles(ll_q *llqt){  // calculamos el minium spanning tree
 }
 
 
-double *ll_p::obtener_satelites(){
-	double d,dpost = INF;
+float *ll_p::obtener_satelites(){
+	float d,dpost = INF;
 	node *xpt = topleft->seg[DRETA];
 	node *xact = xpt->seg[DRETA];
 
@@ -422,8 +422,8 @@ void ll_p::tornar_a_xomig(){
 	xoant = xorig;
 }
 
-void ll_p::trobar_primer_candidat_clt(double *xm){
-	double d,dtop;
+void ll_p::trobar_primer_candidat_clt(float *xm){
+	float d,dtop;
 	node *xtop;
 	node *xodmax;
 
@@ -454,7 +454,7 @@ void ll_p::trobar_primer_candidat_clt(double *xm){
 	xoant = xtop;
 }
 
-double *ll_p::primer_candidat_clt(){
+float *ll_p::primer_candidat_clt(){
 	numcl++; 
 
 	if(!(candidat = (node_satelit *) xoant->noin[orcluster])){
@@ -465,7 +465,7 @@ double *ll_p::primer_candidat_clt(){
 	return candidat->ptnode->coord;  //### no inserta el primer satelite aunque sea bueno e inserta 2 veces xoant
 }
 
-double *ll_p::seguent_candidat_clt(int validacio){
+float *ll_p::seguent_candidat_clt(int validacio){
 
 	candidat->ptnode->marca = numcl;
 	if (validacio)                          // el objeto espacio nos ha validado el candidato al cluster
@@ -502,7 +502,7 @@ double *ll_p::seguent_candidat_clt(int validacio){
 	return candidat->ptnode->coord;
 }
 
-double *ll_p::canviar_orientacio_clt(){
+float *ll_p::canviar_orientacio_clt(){
 	orcluster = (orcluster+1) % 2;    // canviem de sentit, no cambiem xant
 	//	 candidat = (node_satelit *)xoant->noin[orcluster];  // agafem el primer satelit en sentit contrari al 1er candidat
 	//     semilla = xoant;
@@ -529,7 +529,7 @@ void *ll_p::noend(void *pt){
 	return (((node *)pt)->seg[DRETA]);      // si es NULL el pt es el centinella
 }
 
-double *ll_p::llpt(void *pt){
+float *ll_p::llpt(void *pt){
 	return (((node *)pt)->coord);
 }
 
@@ -563,28 +563,28 @@ void ll_p::advrevpt(void **pt){
 
 ////ops_vect///////
 
-double  ll_p::distancia(double *pnt1,double *pnt2){
+float  ll_p::distancia(float *pnt1,float *pnt2){
 	int i;
-	double sum =0.0;
+	float sum =0.0;
 	for(i =0;i<Dim;i++)
 		sum += pow(pnt1[i]-pnt2[i],2);
 	return sqrt(sum);
 }
 
-double *ll_p::mult_esc(double e,double *v){
+float *ll_p::mult_esc(float e,float *v){
 	int i;
-	double *v3;
+	float *v3;
 
-	v3 = (double *)malloc(Dim* sizeof(double));
+	v3 = (float *)malloc(Dim* sizeof(float));
 	for(i=0;i<Dim;i++)  v3[i] = v[i]*e;
 	return v3;
 }
 
-double *ll_p::sum_v (double *v1,double *v2){
+float *ll_p::sum_v (float *v1,float *v2){
 	int i;
-	double *v3;
+	float *v3;
 
-	v3 = (double *)malloc(Dim* sizeof(double));
+	v3 = (float *)malloc(Dim* sizeof(float));
 	for(i=0;i<Dim;i++)  v3[i] = v1[i]+v2[i];
 	return v3;
 }

@@ -6,20 +6,20 @@ extern "C" {
 }
 
 
-M_b::M_b(int d,double *b){
+M_b::M_b(int d,float *b){
 	int i;
 	int j;
-	double *v_dif,*v_acum1,*v_acum2,*mesc;
+	float *v_dif,*v_acum1,*v_acum2,*mesc;
 
 	Dim =d;
 	/* creamos e inicializamos Mb y MId */
-	Mb    = (double**)malloc(Dim*sizeof(double *));
-	MId   = (double**)malloc(Dim*sizeof(double *));
+	Mb    = (float**)malloc(Dim*sizeof(float *));
+	MId   = (float**)malloc(Dim*sizeof(float *));
 	MInv  = NULL;
 
 	for (i=0;i<Dim;i++){
-		Mb[i] = (double*)calloc(Dim,sizeof(double));
-		MId[i] = (double*)calloc(Dim,sizeof(double));
+		Mb[i] = (float*)calloc(Dim,sizeof(float));
+		MId[i] = (float*)calloc(Dim,sizeof(float));
 	}
 	for (i=0;i<Dim;i++){
 		Mb[i][i] = 1;
@@ -40,11 +40,11 @@ M_b::M_b(int d,double *b){
 
 	/* proceso de ortonormalización de Gram-Schmidt */
 
-	v_acum1 = (double *)calloc(Dim,sizeof(double));
+	v_acum1 = (float *)calloc(Dim,sizeof(float));
 	Mb[0] = norma_v(Mb[0]);
 	for (i=1;i<Dim;i++){
 		delete v_acum1;
-		v_acum1 = (double *)calloc(Dim,sizeof(double)); 
+		v_acum1 = (float *)calloc(Dim,sizeof(float)); 
 		for (j=0;j<i;j++){
 			mesc = mult_esc(mult_v(Mb[i],Mb[j]),Mb[j]);
 			v_acum2 = sum_v(v_acum1,mesc);
@@ -57,18 +57,18 @@ M_b::M_b(int d,double *b){
 
 }
 
-M_b::M_b(int d,double **n_M,double *n_xo){
+M_b::M_b(int d,float **n_M,float *n_xo){
 	int i;
 	Dim = d;
 	Mb = n_M;
 	xo = n_xo;
 
 	/* creamos e inicializamos  MId */
-	MId   = (double**)malloc(Dim*sizeof(double *));
+	MId   = (float**)malloc(Dim*sizeof(float *));
 	MInv  = NULL;
 
 	for (i=0;i<Dim;i++){
-		MId[i] = (double*)calloc(1,Dim*sizeof(double));
+		MId[i] = (float*)calloc(1,Dim*sizeof(float));
 	}
 	for (i=0;i<Dim;i++){
 		MId[i][i] = 1;
@@ -99,10 +99,10 @@ M_b::~M_b(){
 }
 
 
-M_b *M_b::girar(int eix,double angle){
+M_b *M_b::girar(int eix,float angle){
 	// 0 < eix < Dim                    giro bo i  eix en sentit positiu
 
-	double **Mbaux;
+	float **Mbaux;
 
 	// insertamos el giro en la matriz identidad
 	MId[0][0] = cos(angle);
@@ -122,15 +122,15 @@ M_b *M_b::girar(int eix,double angle){
 }
 
 M_b *M_b::replicar(){
-	double **c_Mb;
+	float **c_Mb;
 	int i,j;
 
-	c_Mb = (double **) malloc(Dim*sizeof(double *));
+	c_Mb = (float **) malloc(Dim*sizeof(float *));
 	for (i=0;i<Dim;i++)
-		c_Mb[i] = (double *)malloc(Dim*sizeof(double));
+		c_Mb[i] = (float *)malloc(Dim*sizeof(float));
 
 
-	for (i=0;i<Dim;i++) memmove(c_Mb[i],Mb[i],Dim*sizeof(double));
+	for (i=0;i<Dim;i++) memmove(c_Mb[i],Mb[i],Dim*sizeof(float));
 	//for (j=0;j<Dim;j++) c_Mb[i][j] = Mb[i][j];  
 
 
@@ -140,7 +140,7 @@ M_b *M_b::replicar(){
 
 void M_b::calcular_la_inversa(){
 	int i,j;
-	double **c_Mb;
+	float **c_Mb;
 	// calculamos la inversa  realizados los giros de Mb y antes de aplicarla sobre puntos. Si el Mb resulta optimo se calculara mas de 1 vez
 
 	if (MInv){
@@ -150,12 +150,12 @@ void M_b::calcular_la_inversa(){
 
 	/* copiar la Mb  */ // ya que sera modificada por inv()
 
-	c_Mb = (double **) malloc(Dim*sizeof(double *));
+	c_Mb = (float **) malloc(Dim*sizeof(float *));
 	for (i=0;i<Dim;i++)
-		c_Mb[i] = (double *)malloc(Dim*sizeof(double));
+		c_Mb[i] = (float *)malloc(Dim*sizeof(float));
 
 
-	for (i=0;i<Dim;i++)  memmove(c_Mb[i],Mb[i],Dim*sizeof(double));
+	for (i=0;i<Dim;i++)  memmove(c_Mb[i],Mb[i],Dim*sizeof(float));
 	//for (j=0;j<Dim;j++) c_Mb[i][j] = Mb[i][j];  
 
 	/* calcular inversa */
@@ -168,9 +168,9 @@ void M_b::calcular_la_inversa(){
 }
 
 
-double  *M_b::aplicar(double *punt){  /* aplica Mb al punt y dona el punt per l'espai inferior */
-	double *p2;
-	double *p3;
+float  *M_b::aplicar(float *punt){  /* aplica Mb al punt y dona el punt per l'espai inferior */
+	float *p2;
+	float *p3;
 	p2 = dif_v(punt,xo);
 	p3 = Mxv(MInv,p2);     /* se pasa la inversa */
 
@@ -181,9 +181,9 @@ double  *M_b::aplicar(double *punt){  /* aplica Mb al punt y dona el punt per l'
 	return p3;
 }
 
-double  *M_b::desaplicar(double *punt){  /* operación inversa a aplicar */
-	double *p2;
-	double *p3;
+float  *M_b::desaplicar(float *punt){  /* operación inversa a aplicar */
+	float *p2;
+	float *p3;
 
 	p2 = Mxv(Mb,punt);     
 	p3 = sum_v(p2,xo);
@@ -196,7 +196,7 @@ double  *M_b::desaplicar(double *punt){  /* operación inversa a aplicar */
 }
 
 
-void M_b::rebre_xo(double *punt){
+void M_b::rebre_xo(float *punt){
 	// se ejecutara una vez por avance_cluster() y todas las veces que el pop candidato cruce el hiperplano del pop anterior.
 	//free xo;    //  no fa falta alliverar l'espai. O bé ha estat eliminat al crear el nou xo, o es un xo compartir amb la matriu del pop anterior.
 	xo = punt;  
@@ -214,20 +214,20 @@ M_a *M_b::donar_M_a(M_a *Ma){
 }
 
 
-double *M_b::donar_bopt(){
+float *M_b::donar_bopt(){
 	return Mb[0];
 }
 
 
 // PRIVATE //////////////////////////////////////////////////////////////////
 
-double **M_b::inv(double **M){
+float **M_b::inv(float **M){
 	int i,j,ii,aux;
-	double **Inv,Mji;
+	float **Inv,Mji;
 
-	Inv = (double**)malloc(Dim*sizeof(double *));
+	Inv = (float**)malloc(Dim*sizeof(float *));
 	for (i=0;i<Dim;i++)
-		Inv[i] = (double *)calloc(Dim,sizeof(double));
+		Inv[i] = (float *)calloc(Dim,sizeof(float));
 	for (i=0;i<Dim;i++)
 		Inv[i][i] = 1;
 
@@ -263,11 +263,11 @@ double **M_b::inv(double **M){
 	return Inv;
 }
 
-double *M_b::Mxv(double **M1,double *v){
+float *M_b::Mxv(float **M1,float *v){
 	// vxM, trabajamos con vectores fila.
 	int i,j;
-	double sum;
-	double *v3 = (double *) malloc(Dim*sizeof(double));
+	float sum;
+	float *v3 = (float *) malloc(Dim*sizeof(float));
 
 	for(i=0;i<Dim;i++){
 		sum = 0;
@@ -280,16 +280,16 @@ double *M_b::Mxv(double **M1,double *v){
 }
 
 
-double **M_b::MxM(double **M1,double **M2){
+float **M_b::MxM(float **M1,float **M2){
 	// vxM, trabajos con vectores fila.
 	int i,ii,j;
-	double sum;
-	double **M3;
+	float sum;
+	float **M3;
 
-	M3 = (double**)malloc(Dim*sizeof(double *));
+	M3 = (float**)malloc(Dim*sizeof(float *));
 
 	for (i=0;i<Dim;i++)
-		M3[i] = (double *)calloc(1,Dim*sizeof(double));
+		M3[i] = (float *)calloc(1,Dim*sizeof(float));
 
 	for(i=0;i<Dim;i++){
 		for(ii=0;ii<Dim;ii++){
@@ -303,49 +303,49 @@ double **M_b::MxM(double **M1,double **M2){
 	return M3;
 }
 
-double *M_b::mult_esc(double e,double *v){
+float *M_b::mult_esc(float e,float *v){
 	int i;
-	double *v3;
+	float *v3;
 
-	v3 = (double *)malloc(Dim* sizeof(double));
+	v3 = (float *)malloc(Dim* sizeof(float));
 	for(i=0;i<Dim;i++)  v3[i] = v[i]*e;
 	return v3;
 }
 
-double M_b::mult_v(double *v1,double *v2){
+float M_b::mult_v(float *v1,float *v2){
 	int i;
-	double sum = 0.0;
+	float sum = 0.0;
 	for(i=0;i<Dim;i++){
 		sum += v1[i]* v2[i];
 	}
 	return sum;
 }
 
-double *M_b::sum_v (double *v1,double *v2){
+float *M_b::sum_v (float *v1,float *v2){
 	int i;
-	double *v3;
+	float *v3;
 
-	v3 = (double *)malloc(Dim* sizeof(double));
+	v3 = (float *)malloc(Dim* sizeof(float));
 	for(i=0;i<Dim;i++)  v3[i] = v1[i]+v2[i];
 	return v3;
 }
 
-double *M_b::dif_v (double *v2,double *v1){
+float *M_b::dif_v (float *v2,float *v1){
 	int i;
-	double *v3;
+	float *v3;
 
-	v3 = (double *)malloc(Dim* sizeof(double));
+	v3 = (float *)malloc(Dim* sizeof(float));
 	for(i=0;i<Dim;i++)  v3[i] = v2[i]-v1[i];
 	return v3;
 }
 
-double *M_b::norma_v(double *v){
+float *M_b::norma_v(float *v){
 	// devuelve el vector normalizado
 	int i;
-	double nrm =0.0;
-	double *v3;
+	float nrm =0.0;
+	float *v3;
 
-	v3 = (double *)malloc(Dim* sizeof(double));
+	v3 = (float *)malloc(Dim* sizeof(float));
 	for(i=0;i<Dim;i++)  nrm += pow(v[i],2);
 	nrm = sqrt(nrm);
 	for(i=0;i<Dim;i++)  v3[i] = v[i]/nrm;

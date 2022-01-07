@@ -23,14 +23,14 @@ class ll_p{
 	private:
 
 		int   Dim;
-		double dmax;
+		float dmax;
 		int   orcluster;            // primero damos los candidatos a la derecha y luego a la izquierda de xo sobre la coordenada X
 		int   numcl ;               // lleva la cuenta del nº de rondas
-		double sum_w;                // suma de los pesos de los puntos 
-		double suma_d;
+		float sum_w;                // suma de los pesos de los puntos 
+		float suma_d;
 
 		typedef struct node{
-			double *coord;
+			float *coord;
 			int    marca;
 			node  *seg[2];
 			void  *noin[2];      //1º:enlaza nodos fuera del spamming tree. 2º:enlaza satelites del nodo
@@ -52,9 +52,9 @@ class ll_p{
 		int vn_punts;
 		node *topright;
 		node *topleft;
-		double *min;
-		double *max;
-		double *x_mean; // per calcular el xmig
+		float *min;
+		float *max;
+		float *x_mean; // per calcular el xmig
 
 
 		// modificadoras
@@ -67,18 +67,18 @@ class ll_p{
 
 
 		// inicialitzacio
-		// double *calcular_xomig_corba(); // cerca el punt origen de la corba (el més proper a xmean)
+		// float *calcular_xomig_corba(); // cerca el punt origen de la corba (el més proper a xmean)
 		void calcular_max_min_cluster();
 
 		void obtener_quartiles(ll_q *ll_qt);  // calculamos los quartiles sobre las distancias obtenidas del minium spaming tree de los puntos.
-		double *obtener_satelites();
+		float *obtener_satelites();
 
 
 		// ops vect
 
-		double *mult_esc(double e,double *v);
-		double distancia(double *pnt1,double *pnt2);
-		double *sum_v (double *v1,double *v2);
+		float *mult_esc(float e,float *v);
+		float distancia(float *pnt1,float *pnt2);
+		float *sum_v (float *v1,float *v2);
 
 	public:
 
@@ -86,30 +86,30 @@ class ll_p{
 		ll_p(int d);
 		~ll_p();
 
-		void add_ordX_principal(double *vect);
+		void add_ordX_principal(float *vect);
 
 		// inicializacion
-		double inicialitzacio_principal();
+		float inicialitzacio_principal();
 		void inicialitzacio_final();
 		void tornar_a_xomig();                  // tornem al punt origen per ferla en sentit contrari       
 		// als espais finals, tornarem el xmean ponderat per l'htail del cluster 
 
 		// modificadoras
-		void  trobar_primer_candidat_clt(double *xo);// cerca el primer candidat al cluster. 
-		double *canviar_orientacio_clt();         // comença la cerca en sentit contrari, torna el 1er candidat 
+		void  trobar_primer_candidat_clt(float *xo);// cerca el primer candidat al cluster. 
+		float *canviar_orientacio_clt();         // comença la cerca en sentit contrari, torna el 1er candidat 
 
 		// consultoras
 
-		double *primer_candidat_clt();   // retorna el primer candidat al cluster.
-		double *seguent_candidat_clt(int validacio); // cerca el seguent candidat i li pasan la validacio del ultim
+		float *primer_candidat_clt();   // retorna el primer candidat al cluster.
+		float *seguent_candidat_clt(int validacio); // cerca el seguent candidat i li pasan la validacio del ultim
 		int   n_punts();								  // nº punts del cluster
-		void  donar_max_min_xomig(double **mx, double **mn,double **xm,double *s_d);
+		void  donar_max_min_xomig(float **mx, float **mn,float **xm,float *s_d);
 
 		// consultoras  amb punter
 
 		void resetpt(void **pt);
 		void *noend(void *pt);
-		double *llpt(void *pt);
+		float *llpt(void *pt);
 		void advpt(void **pt);
 		void modpt(void *pt,int info);
 		int  llptmarca(void *pt);

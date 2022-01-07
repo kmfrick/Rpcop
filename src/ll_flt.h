@@ -3,7 +3,7 @@ class ll_flt{
 	private :
 
 		typedef struct node{
-			double info;
+			float info;
 			node  *seg;
 		} node;
 
@@ -16,19 +16,19 @@ class ll_flt{
 		// constructoras
 		ll_flt();
 		~ll_flt();
-		void add(double info);
-		void addrev(double info);
+		void add(float info);
+		void addrev(float info);
 
 
 		// consultoras
 
 		void resetpt(void **pt);
 		void *noend(void *pt);
-		double llpt(void *pt);
+		float llpt(void *pt);
 		void advpt(void **pt);
 
 		// modificadoras
 
-		void modpt(void *pt,double inf);
+		void modpt(void *pt,float inf);
 
 };

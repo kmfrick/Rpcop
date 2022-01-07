@@ -20,7 +20,7 @@ ll_q::~ll_q(){
 	}
 }
 
-void ll_q::add_ord(double info){
+void ll_q::add_ord(float info){
 	node *pt=Topleft;
 	node *newpt;
 
@@ -34,7 +34,7 @@ void ll_q::add_ord(double info){
 
 }
 
-double ll_q::dmax(){
+float ll_q::dmax(){
 	int limite,i;
 	node  *nd;
 

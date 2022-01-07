@@ -10,7 +10,7 @@ class ll_q{
 	private :
 
 		typedef struct node{
-			double info;
+			float info;
 			node  *seg;
 		} node;
 
@@ -25,10 +25,10 @@ class ll_q{
 		// constructoras
 		ll_q(int np);
 		~ll_q();
-		void add_ord(double info);
+		void add_ord(float info);
 
 		// consultoras
 
-		double dmax();
+		float dmax();
 
 };

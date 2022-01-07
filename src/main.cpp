@@ -5,13 +5,13 @@ extern "C" {
 #include <Rcpp.h>
 // [[Rcpp::plugins("cpp11")]]
 // [[Rcpp::export]]
-Rcpp::NumericMatrix pcop (Rcpp::NumericMatrix x, double c_d, double c_h, int profreq = 1, int nparts = 4){
+Rcpp::NumericMatrix pcop_backend (Rcpp::NumericMatrix x, float c_d, float c_h, int profreq = 1, int nparts = 4){
 	espai *psp;
-	double **Ma;
+	float **Ma;
 	int i;
 	ll_p *ll_pt;
-	double vtg;
-	double *mx;
+	float vtg;
+	float *mx;
 
 	// inicialización valores por defecto, despues en el fichero de setup puede que cambien
 	// modificado 16/4/2002
@@ -23,23 +23,31 @@ Rcpp::NumericMatrix pcop (Rcpp::NumericMatrix x, double c_d, double c_h, int pro
 	int Dim = x.ncol();
 	ll_pt = new ll_p(Dim);
 	for (i = 0; i < x.nrow(); i++) {
-		double *begin_row = &(x.row(i)[0]);
-		double *d_punt = (double *) malloc((Dim+1)*sizeof(double));
-		d_punt[0] = 1;d_punt++; // coordenada -1 pel pes.
-		memcpy(d_punt,begin_row,Dim*sizeof(double));
+		float *d_punt = (float*)malloc((Dim + 1) * sizeof(float));
+		d_punt[0] = 1; d_punt++;// coordenada -1 pel pes.
+		for (int j = 0; j < x.ncol(); j++) {
+			d_punt[j] = x(i, j);
+		}
+		if (i == 0) {
+			Rprintf("punt = ");
+			for (int k = 0; k < Dim+1; k++) {
+				Rprintf("%lf ", d_punt[k]);
+			}
+			Rprintf("\n");
+		}
 		ll_pt->add_ordX_principal(d_punt); //###
 	}
 
-	Ma = (double **) malloc(Dim*sizeof(double *));
+	Ma = (float **) malloc(Dim*sizeof(float *));
 	if (Ma == NULL) {
 		Rcpp::stop("Could not allocate Ma.\n");
 	}
 
 	for (i=0;i<Dim;i++){
-		Ma[i] = (double *)calloc(Dim,sizeof(double));
+		Ma[i] = (float *)calloc(Dim,sizeof(float));
 		Ma[i][i]=1;
 	}
-	mx = (double *) calloc(Dim,sizeof(double));
+	mx = (float *) calloc(Dim,sizeof(float));
 	if (mx == NULL) {
 		Rcpp::stop("Could not allocate mx.\n");
 	}
@@ -49,14 +57,17 @@ Rcpp::NumericMatrix pcop (Rcpp::NumericMatrix x, double c_d, double c_h, int pro
 	//fin
 	psp->rebre_M_a(new M_a(Dim,0,Ma,mx));
 	vtg = psp->obtenir_VTG(&mx);
+	Rcpp::Rcout << "vtg: " << vtg << "\n";
 	int nrow, ncol;
-	double *out = (double*)malloc((2 * Dim + 5) * x.nrow() * sizeof(float));
+	float *out = (float*)malloc((2 * Dim + 5) * x.nrow() * sizeof(float));
 	if (out == NULL) {
 		Rcpp::stop("Could not allocate out.\n");
 	}
 	psp->obtenir_data(out, &nrow, &ncol);
 
 	delete psp;
-	return Rcpp::NumericMatrix(nrow, ncol, out); // FIXME: Probable memory leak
+	Rcpp::NumericMatrix proy(nrow, ncol, out); // FIXME: Probable memory leak
+	proy = transpose(proy);
+	return proy;
 
 }

@@ -10,24 +10,24 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// pcop
-Rcpp::NumericMatrix pcop(Rcpp::NumericMatrix x, double c_d, double c_h, int profreq, int nparts);
-RcppExport SEXP _Rpcop_pcop(SEXP xSEXP, SEXP c_dSEXP, SEXP c_hSEXP, SEXP profreqSEXP, SEXP npartsSEXP) {
+// pcop_backend
+Rcpp::NumericMatrix pcop_backend(Rcpp::NumericMatrix x, float c_d, float c_h, int profreq, int nparts);
+RcppExport SEXP _Rpcop_pcop_backend(SEXP xSEXP, SEXP c_dSEXP, SEXP c_hSEXP, SEXP profreqSEXP, SEXP npartsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type x(xSEXP);
-    Rcpp::traits::input_parameter< double >::type c_d(c_dSEXP);
-    Rcpp::traits::input_parameter< double >::type c_h(c_hSEXP);
+    Rcpp::traits::input_parameter< float >::type c_d(c_dSEXP);
+    Rcpp::traits::input_parameter< float >::type c_h(c_hSEXP);
     Rcpp::traits::input_parameter< int >::type profreq(profreqSEXP);
     Rcpp::traits::input_parameter< int >::type nparts(npartsSEXP);
-    rcpp_result_gen = Rcpp::wrap(pcop(x, c_d, c_h, profreq, nparts));
+    rcpp_result_gen = Rcpp::wrap(pcop_backend(x, c_d, c_h, profreq, nparts));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_Rpcop_pcop", (DL_FUNC) &_Rpcop_pcop, 5},
+    {"_Rpcop_pcop_backend", (DL_FUNC) &_Rpcop_pcop_backend, 5},
     {NULL, NULL, 0}
 };
 

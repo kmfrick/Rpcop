@@ -22,13 +22,13 @@ ll_flt::~ll_flt(){
 }
 
 
-void ll_flt::add(double info){
+void ll_flt::add(float info){
 	Topright->info = info;
 	Topright->seg  = (node *)calloc(1,sizeof(node));
 	Topright = Topright->seg;
 }
 
-void ll_flt::addrev(double info){
+void ll_flt::addrev(float info){
 	newTopleft = (node *) malloc (sizeof(node));
 	newTopleft->info = info;
 	newTopleft->seg  = Topleft;
@@ -44,7 +44,7 @@ void *ll_flt::noend(void *pt){
 	// si pt->seg == NULL el camp info de pt estara buit
 }
 
-double ll_flt::llpt(void *pt){
+float ll_flt::llpt(void *pt){
 	return (((node *)pt)->info);
 }
 
@@ -52,7 +52,7 @@ void ll_flt::advpt(void **pt){
 	*pt = ((node *)*pt)->seg;
 }
 
-void ll_flt::modpt(void *pt,double info){
+void ll_flt::modpt(void *pt,float info){
 	((node*)pt)->info = info;
 }
 
