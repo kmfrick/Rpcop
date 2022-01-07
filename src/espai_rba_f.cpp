@@ -5,6 +5,7 @@
 #include "espai.h"
 
 #include <cstdlib>
+#include <Rcpp.h>
 
 #define PI M_PI
 

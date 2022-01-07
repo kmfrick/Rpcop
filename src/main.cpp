@@ -23,10 +23,11 @@ Rcpp::NumericMatrix pcop (Rcpp::NumericMatrix x, double c_d, double c_h, int pro
 	int Dim = x.ncol();
 	ll_pt = new ll_p(Dim);
 	for (i = 0; i < x.nrow(); i++) {
-		if (&(x.row(i)[0]) == NULL) {
-			Rcpp::stop("0-th element of row is null\n");
-		}
-		ll_pt->add_ordX_principal(&(x.row(i)[0])); //###
+		double *begin_row = &(x.row(i)[0]);
+		double *d_punt = (double *) malloc((Dim+1)*sizeof(double));
+		d_punt[0] = 1;d_punt++; // coordenada -1 pel pes.
+		memcpy(d_punt,begin_row,Dim*sizeof(double));
+		ll_pt->add_ordX_principal(d_punt); //###
 	}
 
 	Ma = (double **) malloc(Dim*sizeof(double *));
