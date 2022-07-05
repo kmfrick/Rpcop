@@ -1,4 +1,4 @@
-# Principal Curves on Oriented Points
+# Principal Curves of Oriented Points
 
 The files in this repository provided an implementation of principal curves on oriented points that can be compiled on modern systems.
 
