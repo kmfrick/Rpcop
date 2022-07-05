@@ -3,10 +3,11 @@ Type: Package
 Title: Principal Curves on Oriented Points
 Version: 1.0
 Date: 2022-01-06
-Author: Pedro Delicado, Kevin Michael Frick
+Author: Pedro Delicado, Mario Huerta, Kevin Michael Frick
 Maintainer: Kevin Michael Frick <kmfrick98@gmail.com>
 Description: Computes principal curves on oriented points.
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.7)
 LinkingTo: Rcpp
 Depends: princurve
+RoxygenNote: 7.1.2

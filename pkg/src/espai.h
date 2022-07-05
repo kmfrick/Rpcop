@@ -35,7 +35,6 @@ class espai {
 		float suma_d;  // suma distancies del mstree.
 		float h_tail;  // distancia al pla.
 		float delta;   // advance
-		float diam;    // longitud de la diagonal del cluster. 
 		float *eps_x;  // eps_x conte les distancies minimes entre el xo del cluster i el xmean del cluster perque aquest sigui valid. Es unic per tots els cluster de l'espai actual.
 		float *xomig;  // l'xomig es necesitara per obtenir_STV() i per obtenir el xo i bo_opt inicial de una corba.
 		// quan calculem la corba en sentit contrari no partirem d'aquest xomig si no del corresponent pop.   

@@ -123,7 +123,7 @@ M_b *M_b::girar(int eix,float angle){
 
 M_b *M_b::replicar(){
 	float **c_Mb;
-	int i,j;
+	int i;
 
 	c_Mb = (float **) malloc(Dim*sizeof(float *));
 	for (i=0;i<Dim;i++)
@@ -139,7 +139,7 @@ M_b *M_b::replicar(){
 
 
 void M_b::calcular_la_inversa(){
-	int i,j;
+	int i;
 	float **c_Mb;
 	// calculamos la inversa  realizados los giros de Mb y antes de aplicarla sobre puntos. Si el Mb resulta optimo se calculara mas de 1 vez
 
@@ -222,7 +222,7 @@ float *M_b::donar_bopt(){
 // PRIVATE //////////////////////////////////////////////////////////////////
 
 float **M_b::inv(float **M){
-	int i,j,ii,aux;
+	int i,j,ii;
 	float **Inv,Mji;
 
 	Inv = (float**)malloc(Dim*sizeof(float *));

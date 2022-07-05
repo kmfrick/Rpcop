@@ -1,6 +1,3 @@
-extern "C" {
-#include <cstdlib>
-}
 #include "ll_p.h"
 
 

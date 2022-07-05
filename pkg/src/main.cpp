@@ -3,9 +3,18 @@ extern "C" {
 }
 #include "espai.h"
 #include <Rcpp.h>
-// [[Rcpp::plugins("cpp11")]]
+
+//' @title pcop_backend
+//' @description Computes a principal curve as defined in Delicado (2001). DO NOT use this function unless you know what you are doing. Use `pcop()` instead.
+//' <doi: 10.1007/s001800300145>
+//' @param x    See `pcop()`
+//' @param c_h  See `pcop()`
+//' @param c_d  See `pcop()`
+//' @return A numeric matrix to be parsed by `pcop()`.
 // [[Rcpp::export]]
-Rcpp::NumericMatrix pcop_backend (Rcpp::NumericMatrix x, float c_d, float c_h, int profreq = 1, int nparts = 4){
+Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d, float c_h){
+	int profreq = 1;
+	int nparts = 4;
 	espai *psp;
 	float **Ma;
 	int i;
@@ -28,16 +37,11 @@ Rcpp::NumericMatrix pcop_backend (Rcpp::NumericMatrix x, float c_d, float c_h, i
 		for (int j = 0; j < x.ncol(); j++) {
 			d_punt[j] = x(i, j);
 		}
-		if (i == 0) {
-			Rprintf("punt = ");
-			for (int k = 0; k < Dim+1; k++) {
-				Rprintf("%lf ", d_punt[k]);
-			}
-			Rprintf("\n");
-		}
 		ll_pt->add_ordX_principal(d_punt); //###
 	}
-
+	if (ll_pt->n_punts()< NPTMIN*Dim) {
+		Rcpp::stop("Warning: Not enough points in data matrix. At least %d points are needed for dimension %d.\n", NPTMIN * Dim, Dim);
+	}
 	Ma = (float **) malloc(Dim*sizeof(float *));
 	if (Ma == NULL) {
 		Rcpp::stop("Could not allocate Ma.\n");
@@ -57,7 +61,6 @@ Rcpp::NumericMatrix pcop_backend (Rcpp::NumericMatrix x, float c_d, float c_h, i
 	//fin
 	psp->rebre_M_a(new M_a(Dim,0,Ma,mx));
 	vtg = psp->obtenir_VTG(&mx);
-	Rcpp::Rcout << "vtg: " << vtg << "\n";
 	int nrow, ncol;
 	float *out = (float*)malloc((2 * Dim + 5) * x.nrow() * sizeof(float));
 	if (out == NULL) {
@@ -66,7 +69,7 @@ Rcpp::NumericMatrix pcop_backend (Rcpp::NumericMatrix x, float c_d, float c_h, i
 	psp->obtenir_data(out, &nrow, &ncol);
 
 	delete psp;
-	Rcpp::NumericMatrix proy(nrow, ncol, out); // FIXME: Probable memory leak
+	Rcpp::NumericMatrix proy(nrow, ncol, out);
 	proy = transpose(proy);
 	return proy;
 

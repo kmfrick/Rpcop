@@ -17,8 +17,6 @@ class ll_q{
 		int npunts;
 
 		node *Topleft;
-		node *newTopright;
-		node *Topright;
 
 	public :
 
