@@ -51,7 +51,7 @@ class espai {
 			float  VTG;
 			M_b    *Mb;
 			M_b    *Mb_ant;
-			espai  *espai;
+			espai  *espai_;
 			m_d_s  mds;
 		}optims;
 
@@ -67,7 +67,7 @@ class espai {
 			float var_k;
 			float span;
 			float density;
-			espai *espai;         
+			espai *espai_;
 		};
 
 		//	 ll_pnt *ll_pop; ###

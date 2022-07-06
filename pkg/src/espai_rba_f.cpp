@@ -29,7 +29,7 @@ espai::~espai(){
 	//	free(mds.xmean);        s'esborra a construir_corba_sentit_contrari()
 	//	free(optims.mds.xmean); s'esborra a construir_corba_sentit_contrari()
 	//	delete (optims.Mb);     estará guardat a les llistes
-	//	delete (optims.espai);  estará guardat a les llistes
+	//	delete (optims.espai_);  estará guardat a les llistes
 
 	//	free(xo.act);  s'esborren al sortir de calcular_corba_en_un_sentit() i calcular_corba_en_sentit_contrari()
 	//	free(xo.ant);  s'esborren al sortir de calcular_corba_en_un_sentit() i calcular_corba_en_sentit_contrari()
@@ -222,10 +222,10 @@ void espai::calcular_Mb(int ejegir,M_b *Mb,float porcion_pinza){
 			VTG = espai->obtenir_VTG(&mds.xmean);
 			if(VTG < optims.VTG ){
 				delete optims.Mb;   // borramos un Mb_act!= Mb, único y ya tratado.
-				delete optims.espai;
+				delete optims.espai_;
 				optims.VTG   = VTG;
 				optims.Mb    = Mb;
-				optims.espai = espai;
+				optims.espai_ = espai;
 				delete optims.mds.xmean;
 				optims.mds.xmean = Mb->desaplicar(mds.xmean);// obt posible pop
 				optims.mds.span  = mds.span;
@@ -282,15 +282,15 @@ float espai::calcular_corba_en_un_sentit(){
 	n_bo = mult_esc(-2*h_tail,optims.Mb_ant->donar_bopt()); // es necesari donar xoant al Mb_ant per calcular la operacio ficorba().
 	xo.ant = sum_v(xomig,n_bo);
 	optims.Mb_ant->rebre_xo(xo.ant);
-	delete n_bo;
+	free(n_bo);
 
-	optims.espai = NULL;
+	optims.espai_ = NULL;
 	xo.act = NULL;
 	optims.mds.xmean = (float *) malloc(Dim*sizeof(float));
 	memmove(optims.mds.xmean,xomig, Dim*sizeof(float)); // ?el xomig passat el necesita la clase llp?.
 	do {
-		delete optims.espai;
-		delete v_xact2xm;
+		delete optims.espai_;
+		free(v_xact2xm);
 		delete xo.act;
 		xo.act = optims.mds.xmean;
 		optims.Mb->rebre_xo(xo.act);// aquesta Mb sera inmediatament eliminat ja que te VTG=INF, pero difondra el xo_act entre la resta de matrius candidates a cada gir.
@@ -298,7 +298,7 @@ float espai::calcular_corba_en_un_sentit(){
 		/* calcular SVG optima per el xo donat */
 
 		optims.VTG = INF;   // el optims.Mb contdrá una replica del optimo del advance_cluster() anterior que es perdrá a calcular_Mb si no hem acabat la corba en aquest sentit.
-		optims.espai = NULL;   // l'anterior espai i l'anterior mb optims no es borren, ja que els apunten desde les llistes resultat.
+		optims.espai_ = NULL;   // l'anterior espai i l'anterior mb optims no es borren, ja que els apunten desde les llistes resultat.
 		optims.mds.xmean = NULL;  // l'xo que hem pasat a Mb no es pot eliminar fins que sigui substituit per un altre.
 		pinza = PI/2;
 		while (pinza > PI/16){
@@ -315,7 +315,7 @@ float espai::calcular_corba_en_un_sentit(){
 	xomig = optims.mds.xmean;  // nou pop mig de la corba. Aquest no el podem perdre.
 
 	optims.Mb->rebre_xo(optims.mds.xmean); // rep la replica allargada per la Mb optima. Amb aquesta es calculará Ma.
-	// optims.espai->rebre_M_a(optims.Mb->donar_M_a(Ma)); // li pasem el Ma per situarse a les coordenades originals aplicat al seu pla(Mb)
+	// optims.espai_->rebre_M_a(optims.Mb->donar_M_a(Ma)); // li pasem el Ma per situarse a les coordenades originals aplicat al seu pla(Mb)
 
 	n_pop = (pop *) malloc(sizeof(pop));
 	sum = 0;
@@ -333,7 +333,7 @@ float espai::calcular_corba_en_un_sentit(){
 	n_pop->var_k = optims.VTG;
 	n_pop->span  = optims.mds.span;
 	n_pop->density = optims.mds.density;
-	n_pop->espai  = optims.espai;
+	n_pop->espai_  = optims.espai_;
 
 	ll_pop->add(n_pop);
 	/* actualitzem cluster */
@@ -342,7 +342,7 @@ float espai::calcular_corba_en_un_sentit(){
 	optims.mds.xmean = sum_v(xo.act,n_bo); // ho guardo a xmean pq aquest s'asigna a xo a l'inici del bucle pel seguent pop.
 
 	xo.act = NULL;   // xo.ant apunta ara a xo.act, per lo tant es borrará quan es borri xo.ant.
-	delete n_bo;
+	free(n_bo);
 
 	/* trobar els seg. pops en el sentit original del bo del cluster */
 
@@ -361,7 +361,7 @@ float espai::calcular_corba_en_un_sentit(){
 		/* calcular SVG optima per el xo donat */
 
 		optims.VTG = INF;   // el optims.Mb contdrá una replica del optimo del advance_cluster() anterior que es perdrá a calcular_Mb si no hem acabat la corba en aquest sentit.
-		optims.espai = NULL;   // l'anterior espai i l'anterior mb optims no es borren, ja que els apunten desde les llistes resultat.
+		optims.espai_ = NULL;   // l'anterior espai i l'anterior mb optims no es borren, ja que els apunten desde les llistes resultat.
 		optims.mds.xmean = NULL;  // l'xo que hem pasat a Mb no es pot eliminar fins que sigui substituit per un altre.
 		pinza = PINZA_MAX;
 		while (pinza > PINZA_MIN){
@@ -386,14 +386,14 @@ float espai::calcular_corba_en_un_sentit(){
 			delete optims.mds.xmean;
 			n_bo = mult_esc(naux_delta*delta,optims.Mb_ant->donar_bopt());
 			optims.mds.xmean = sum_v(xo.ant,n_bo);  // Per el 1er pop avançariem el centre de la corba. En els seguents pop tindriem un futur xo mes allunyat.
-			delete n_bo;
+			free(n_bo);
 			delete optims.Mb;
 			optims.Mb = optims.Mb_ant->replicar(); // no s'asigna l'original pq el boptant esta a b_ast. Será necesari asignar-li el nou xo.
 		}
 		else
 			if (major(v_xact2xm, eps_x)){ // comprovem que el xo i el xmean no resultin massa allunyats, si hem tingut que desplaçar el xmean segur que es cumplira la condicio per l'accio del naux_delta. eliminem v_xant2xm
 				/* els valors no son valids, hem de buscar un altre cluster partint del xmean */
-				delete optims.espai;
+				delete optims.espai_;
 			}else{
 				/* els valors son bons */
 				/* actualitzem llistes */
@@ -402,7 +402,7 @@ float espai::calcular_corba_en_un_sentit(){
 				optims.mds.xmean = allargar(optims.mds.xmean); // el nou xmean optim será el que es guardará a les llistes.
 
 				optims.Mb->rebre_xo(optims.mds.xmean); // rep la replica allargada per la Mb optima. Amb aquesta es calculará Ma.
-				//		optims.espai->rebre_M_a(optims.Mb->donar_M_a(Ma)); // li pasem el Ma per situarse a les coordenades originals aplicat al seu pla(Mb)
+				//		optims.espai_->rebre_M_a(optims.Mb->donar_M_a(Ma)); // li pasem el Ma per situarse a les coordenades originals aplicat al seu pla(Mb)
 
 				n_pop = (pop *) malloc(sizeof(pop));
 				sum += distancia(xo.act,xo.ant);
@@ -420,7 +420,7 @@ float espai::calcular_corba_en_un_sentit(){
 				n_pop->var_k = optims.VTG;
 				n_pop->span  = optims.mds.span;
 				n_pop->density = optims.mds.density;
-				n_pop->espai = optims.espai;
+				n_pop->espai_ = optims.espai_;
 
 				ll_pop->add(n_pop);
 
@@ -432,7 +432,7 @@ float espai::calcular_corba_en_un_sentit(){
 
 				xo.act = NULL;   // xo.ant apunta ara a xo.act, per lo tant es borrará quan es borri xo.ant.
 				//      delete b_opt;   s'eliminara juntament a la Mb a la que pertany. Es pot eliminar pq el que conté b_ast es una copia allargada.
-				delete n_bo;
+				free(n_bo);
 				naux_delta = 1;
 			}
 	}
@@ -473,7 +473,7 @@ float espai::calcular_corba_en_sentit_contrari(){
 	optims.mds.xmean = sum_v(xo.ant,n_bo); // ho guardo a xmean pq aquest s'asigna a xo a l'inici del bucle pel seguent pop. L'anterior valor de optims.mds.xmean es NULL.
 
 	// xo.act = NULL            el primer xo.act que borrarem será l'últim de la corba en sentit contrari.
-	delete n_bo;
+	free(n_bo);
 	naux_delta = 1;
 
 	while(no_creua_corba(xo.ant)){
@@ -489,7 +489,7 @@ float espai::calcular_corba_en_sentit_contrari(){
 		/* calcular SVG optima per el xo donat */
 
 		optims.VTG = INF;   // el optims.Mb contdrá una replica del optimo del advance_cluster() anterior que es perdrá a calcular_Mb si no hem acabat la corba en aquest sentit.
-		optims.espai = NULL;   // l'anterior espai i l'anterior mb optims no es borren, ja que els apunten desde les llistes resultat.
+		optims.espai_ = NULL;   // l'anterior espai i l'anterior mb optims no es borren, ja que els apunten desde les llistes resultat.
 		optims.mds.xmean = NULL;  // l'xo que hem pasat a Mb no es pot eliminar fins que sigui substituit per un altre.
 		pinza = PINZA_MAX;
 		while (pinza > PINZA_MIN){
@@ -512,14 +512,14 @@ float espai::calcular_corba_en_sentit_contrari(){
 			delete optims.mds.xmean;
 			n_bo = mult_esc(naux_delta*delta,optims.Mb_ant->donar_bopt());
 			optims.mds.xmean = sum_v(xo.ant,n_bo);
-			delete n_bo;
+			free(n_bo);
 			delete optims.Mb;
 			optims.Mb = optims.Mb_ant->replicar(); // no s'asigna l'original pq el boptant esta a b_ast. Será necesari asignar-li el nou xo.
 		}
 		else
 			if (major(v_xact2xm, eps_x)){    // comprovem que el xo i el xmean no resultin massa allunyats, si hem tingut que desplaçar el xmean segur que es cumplira la condicio per l'accio del naux_delta. eliminem v_xant2xm
 				/* els valors no son valids, hem de buscar un altre cluster partint del xmean */
-				delete optims.espai;
+				delete optims.espai_;
 			}else{
 				/* els valors son bons */
 				/* actualitzem llistes */
@@ -528,7 +528,7 @@ float espai::calcular_corba_en_sentit_contrari(){
 				optims.mds.xmean = allargar(optims.mds.xmean); // el nou xmean optim será el que es guardará a les llistes.
 
 				optims.Mb->rebre_xo(optims.mds.xmean); // rep la replica allargada per la Mb optima. Amb aquesta es calculará Ma.
-				//		optims.espai->rebre_M_a(optims.Mb->donar_M_a(Ma)); // li pasem el Ma per situarse a les coordenades originals aplicat al seu pla(Mb)
+				//		optims.espai_->rebre_M_a(optims.Mb->donar_M_a(Ma)); // li pasem el Ma per situarse a les coordenades originals aplicat al seu pla(Mb)
 
 				b_opt = optims.Mb->donar_bopt();   // ens servira per actualitzar el cluster
 				n_bo  = mult_esc(-1,b_opt);        // tots els vectors de b_ast tindran la mateixa orientacio.
@@ -544,11 +544,11 @@ float espai::calcular_corba_en_sentit_contrari(){
 
 				n_pop->alpha = optims.mds.xmean;	 // los puntos y vectores de salidan serán de dimension Dim+profundidad.
 				n_pop->b_ast = allargar(n_bo);      // los puntos y vectores de salidan seran de dimension Dim+profundidad, b_opt no esta normalitzada. se guarda en sentido contrario
-				delete n_bo;
+				free(n_bo);
 				n_pop->var_k = optims.VTG;
 				n_pop->span  = optims.mds.span;
 				n_pop->density = optims.mds.density;
-				n_pop->espai = optims.espai;
+				n_pop->espai_ = optims.espai_;
 
 				ll_pop->addrev(n_pop);
 
@@ -561,7 +561,7 @@ float espai::calcular_corba_en_sentit_contrari(){
 
 				xo.act = NULL;   // xo.ant apunta ara a xo.act, per lo tant es borrará quan es borri xo.ant.
 				//      delete b_opt;   s'eliminara juntament a la Mb a la que pertany. Es pot eliminar pq el que conté b_ast es una copia allargada del vector amb el sentit corregit.
-				delete n_bo;
+				free(n_bo);
 				naux_delta = 1;
 
 			}
@@ -650,7 +650,8 @@ float *espai::obtenir_bo_inicial(float *alfa){
 }
 
 float espai::Bmst(){
-	float cd,lbeta,ubeta,S,fact;
+	float cd,S,fact; 
+	//float ubeta, lbeta;
 	double par_f,res;
 	int i;
 
@@ -658,8 +659,8 @@ float espai::Bmst(){
 	par_f =(Dim/2.)+1;
 	cd = pow(PI,Dim/2.)/exp(gammln(par_f));
 	par_f = 1./Dim;
-	lbeta = exp(gammln(par_f))/(Dim*pow(cd,1./Dim));
-	ubeta = pow(2,1./Dim)*lbeta;
+	//lbeta = exp(gammln(par_f))/(Dim*pow(cd,1./Dim));
+	//ubeta = pow(2,1./Dim)*lbeta;
 
 	S=0;
 	fact=1.;
@@ -831,7 +832,7 @@ float espai::finalitzacio(){
 		xomig_0 = mult_esc(((pop *)ll_pop->llpt(ptant))->I,
 				((pop *)ll_pop->llpt(pt))->alpha);
 		xomig_1 = sum_v(xomig,xomig_0);
-		delete xomig_0;
+		free(xomig_0);
 		delete xomig;
 		xomig = mult_esc(((pop *)ll_pop->llpt(pt))->I
 				*((pop *)ll_pop->llpt(ptant))->I
@@ -897,7 +898,7 @@ void  espai::obtenir_data(float* result, int* ncol, int* nrow){
 			*(result++) = ((pop *)ll_pop->llpt(pt))->b_ast[i];
 		(*nrow)++;
 
-		sespai = ((pop *)ll_pop->llpt(pt))->espai;
+		sespai = ((pop *)ll_pop->llpt(pt))->espai_;
 		sll_pop = sespai->ll_pop;
 
 		// subspai //
