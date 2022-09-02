@@ -1,6 +1,7 @@
 #include "mb.h"
 #include <cstdlib>
 #include <cmath>
+#include <cstring>
 extern "C" {
 #include <memory.h>
 }
