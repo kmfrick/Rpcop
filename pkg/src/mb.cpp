@@ -308,7 +308,7 @@ float* M_b::mult_esc(float e,float* v){
 	int i;
 	float* v3;
 
-	v3 = new float[Dim* sizeof(float)];
+	v3 = new float[Dim];
 	for(i=0;i<Dim;i++)  v3[i] = v[i]*e;
 	return v3;
 }
@@ -326,7 +326,7 @@ float* M_b::sum_v (float* v1,float* v2){
 	int i;
 	float* v3;
 
-	v3 = new float[Dim* sizeof(float)];
+	v3 = new float[Dim];
 	for(i=0;i<Dim;i++)  v3[i] = v1[i]+v2[i];
 	return v3;
 }
@@ -335,7 +335,7 @@ float* M_b::dif_v (float* v2,float* v1){
 	int i;
 	float* v3;
 
-	v3 = new float[Dim* sizeof(float)];
+	v3 = new float[Dim];
 	for(i=0;i<Dim;i++)  v3[i] = v2[i]-v1[i];
 	return v3;
 }
@@ -346,7 +346,7 @@ float* M_b::norma_v(float* v){
 	float nrm =0.0;
 	float* v3;
 
-	v3 = new float[Dim* sizeof(float)];
+	v3 = new float[Dim];
 	for(i=0;i<Dim;i++)  nrm += pow(v[i],2);
 	nrm = sqrt(nrm);
 	for(i=0;i<Dim;i++)  v3[i] = v[i]/nrm;
