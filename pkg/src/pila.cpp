@@ -7,7 +7,7 @@ extern "C" {
 pila::pila(){top = NULL;}
 
 void pila::apilar (void *pt){
-	n_top = (node *)malloc(sizeof(node));
+	n_top = new node;
 
 	n_top->pt = pt;
 	n_top->seg = top;
@@ -18,7 +18,7 @@ void *pila::desapilar(){
 	void  *tp=top->pt;              // no comprovem si la pila es buida, es suposa un control extern
 
 	n_top = top->seg;
-	free(top);
+	delete top;
 	top = n_top;
 
 	return tp;

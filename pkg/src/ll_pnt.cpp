@@ -5,7 +5,7 @@
 
 
 ll_pnt::ll_pnt(){
-	Topleft = (node *) calloc(1,sizeof(node));
+	Topleft = new node();
 	Topright = Topleft;
 }
 
@@ -24,12 +24,12 @@ ll_pnt::~ll_pnt(){
 
 void ll_pnt::add(void *info){
 	Topright->info = info;
-	Topright->seg  = (node *)calloc(1,sizeof(node));
+	Topright->seg  = new node();
 	Topright = Topright->seg;
 }
 
 void ll_pnt::addrev(void *info){
-	newTopleft = (node *) malloc (sizeof(node));
+	newTopleft = new node;
 	newTopleft->info = info;
 	newTopleft->seg  = Topleft;
 	Topleft = newTopleft;

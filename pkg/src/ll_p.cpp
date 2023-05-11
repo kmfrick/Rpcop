@@ -9,11 +9,11 @@ ll_p::ll_p(int d){
 	sum_w = 0; // suma dels pesos dels punts
 	suma_d = 0;
 
-	topleft = (node *) malloc(sizeof(node));
-	topleft->coord = (float *) calloc(Dim+1,sizeof(float));topleft->coord++;
+	topleft = new node;
+	topleft->coord = new float[Dim + 1]();topleft->coord++;
 	topleft->coord[X] = -1*INF; 
-	topright = (node *) malloc(sizeof(node));
-	topright->coord = (float *) calloc(Dim+1,sizeof(float));topright->coord++; // Dim +1 para incluir los pesos
+	topright = new node;
+	topright->coord = new float[Dim + 1]();topright->coord++; // Dim +1 para incluir los pesos
 	topright->coord[X] = INF; 
 
 
@@ -31,11 +31,11 @@ ll_p::ll_p(int d){
 	topright->marca = -1; // marca de ja insertats al spanning tree
 	topleft->marca = -1;
 	vn_punts = 0;
-	max = (float *) malloc(Dim*sizeof(float));
+	max = new float[Dim];
 	for(i=0;i<Dim;i++) max[i] = -1*INF; 
-	min = (float *) malloc(Dim*sizeof(float));
+	min = new float[Dim];
 	for(i=0;i<Dim;i++) min[i] = INF; 
-	x_mean = (float *) calloc(Dim,sizeof(float));  //si es una llista de un espai de prof 0, es calculara l'xmean,
+	x_mean = new float[Dim + 1]();  //si es una llista de un espai de prof 0, es calculara l'xmean,
 	//sino, sera l'origen de coordenades, equivalent al ppp del espai superior.   
 }
 
@@ -48,8 +48,8 @@ ll_p::~ll_p(){
 		while(pt){ 
 			auxpt = pt;
 			pt = pt->seg[DRETA];
-			free((auxpt->coord)-1); // per corregir la posicio que deixem lliure al baixar a Dim-1
-			free(auxpt);
+			delete ((auxpt->coord)-1); // per corregir la posicio que deixem lliure al baixar a Dim-1
+			delete auxpt;
 		}
 	else	 
 		while(pt){
@@ -57,22 +57,22 @@ ll_p::~ll_p(){
 			while(ptst){
 				auxptst = ptst;
 				ptst = ptst->seg;
-				free(auxptst);
+				delete auxptst;
 			}
 			ptst = (node_satelit *)pt->noin[ESQUERRA];
 			while(ptst){
 				auxptst = ptst;
 				ptst = ptst->seg;
-				free(auxptst);
+				delete auxptst;
 			}
 			auxpt = pt;
 			pt = pt->seg[DRETA];
-			free((auxpt->coord)-1); // per corregir la posicio que deixem lliure al baixar a Dim-1
-			free(auxpt);
+			delete((auxpt->coord)-1); // per corregir la posicio que deixem lliure al baixar a Dim-1
+			delete auxpt;
 		}
 
-	//	free (max);   // les eliminarán l'espai a qui li pasem, quan les hagi utilitzat.
-	//	free (min);
+	//	delete (max);   // les eliminarán l'espai a qui li pasem, quan les hagi utilitzat.
+	//	delete (min);
 }
 
 
@@ -90,7 +90,7 @@ void ll_p::add_ordX_principal(float *vect){
 		while (vect[X]<act_node->coord[X]) {
 			act_node = act_node->seg[ESQUERRA];
 		}
-		new_node =  (node *) malloc(sizeof(node));
+		new_node =  new node;
 		new_node->coord = vect;
 		new_node->marca = 0;
 		new_node->seg[ESQUERRA] = act_node;
@@ -108,7 +108,7 @@ void ll_p::add_ordX_principal(float *vect){
 		while (vect[X]>act_node->coord[X]) {
 			act_node = act_node->seg[DRETA];
 		}
-		new_node = (node *) malloc(sizeof(node));
+		new_node = new node;
 		new_node->coord = vect;
 		new_node->marca = 0;
 		new_node->seg[DRETA] = act_node;
@@ -409,7 +409,7 @@ float *ll_p::obtener_satelites(){
 void ll_p::add_satelit(int or_,node *ptor,node *ptdsti){
 	node_satelit *new_nst;
 
-	new_nst = (node_satelit *) malloc(sizeof(node_satelit));
+	new_nst = new node_satelit;
 	new_nst->ptnode = ptdsti;
 	new_nst->seg = (node_satelit *)ptor->noin[or_];   // s'afegeixen per devant
 	ptor->noin[or_] = new_nst;
@@ -572,7 +572,7 @@ float *ll_p::mult_esc(float e,float *v){
 	int i;
 	float *v3;
 
-	v3 = (float *)malloc(Dim* sizeof(float));
+	v3 = new float[Dim];
 	for(i=0;i<Dim;i++)  v3[i] = v[i]*e;
 	return v3;
 }
@@ -581,7 +581,7 @@ float *ll_p::sum_v (float *v1,float *v2){
 	int i;
 	float *v3;
 
-	v3 = (float *)malloc(Dim* sizeof(float));
+	v3 = new float[Dim];
 	for(i=0;i<Dim;i++)  v3[i] = v1[i]+v2[i];
 	return v3;
 }

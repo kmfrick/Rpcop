@@ -6,7 +6,7 @@ extern "C" {
 #include "ll_flt.h"
 
 ll_flt::ll_flt(){
-	Topleft = (node *) malloc(sizeof(node));
+	Topleft = new node;
 	Topright = Topleft;
 }
 
@@ -24,12 +24,12 @@ ll_flt::~ll_flt(){
 
 void ll_flt::add(float info){
 	Topright->info = info;
-	Topright->seg  = (node *)calloc(1,sizeof(node));
+	Topright->seg  = new node();
 	Topright = Topright->seg;
 }
 
 void ll_flt::addrev(float info){
-	newTopleft = (node *) malloc (sizeof(node));
+	newTopleft = new node;
 	newTopleft->info = info;
 	newTopleft->seg  = Topleft;
 	Topleft = newTopleft;

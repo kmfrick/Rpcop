@@ -16,9 +16,9 @@ M_a::M_a(int d,int p,float **M,float *x){
 
 M_a::~M_a(){
 	int i;
-	for (i=0;i<Dim;i++)  free(Ma[i]);
-	free(Ma);
-	free(xa);
+	for (i=0;i<Dim;i++)  delete[] Ma[i];
+	delete[] Ma;
+	delete[] xa;
 }
 
 float	 *M_a::aplicar_Ma_punt(float *punt){
@@ -29,7 +29,7 @@ float	 *M_a::aplicar_Ma_punt(float *punt){
 	p2 = Mxv(Ma,punt-profundidad); // habremos creado todos los puntos de Dim+profundidad con las 1eras pos. =0
 	p3 = sum_v(p2,xa);
 
-	free(p2);
+	delete[] p2;
 	return p3;
 
 }
@@ -54,8 +54,8 @@ M_a *M_a::donar_M_a(float **Mbopt,float *xo){
 	n_prof = profundidad +1;
 
 	/* new Ma */
-	n_Ma  = (float**)malloc(Dim*sizeof(float *));
-	for (i=0;i<Dim;i++)  n_Ma[i] = (float*)calloc(Dim,sizeof(float));
+	n_Ma  = new float*[Dim];
+	for (i=0;i<Dim;i++)  n_Ma[i] = new float[Dim]();
 
 	for (i=0;i<profundidad;i++) n_Ma[i][i] = 1;
 
@@ -66,8 +66,8 @@ M_a *M_a::donar_M_a(float **Mbopt,float *xo){
 	n_Ma2 = MxM(Ma,n_Ma);
 
 
-	for (i=0;i<Dim;i++) free(n_Ma[i]);
-	free(n_Ma);
+	for (i=0;i<Dim;i++) delete[] n_Ma[i];
+	delete[] n_Ma;
 
 	/* new xa */
 	n_xa = aplicar_Ma_punt(xo);
@@ -84,7 +84,7 @@ float *M_a::Mxv(float **M1,float *v){
 	// vxM, trabajamos con vectores fila.
 	int i,j;
 	float sum;
-	float *v3 = (float *) malloc(Dim*sizeof(float));
+	float *v3 = new float[Dim];
 
 	for(i=0;i<Dim;i++){
 		sum = 0;
@@ -103,10 +103,10 @@ float **M_a::MxM(float **M1,float **M2){
 	float sum;
 	float **M3;
 
-	M3 = (float**)malloc(Dim*sizeof(float *));
+	M3 = new float*[Dim];
 
 	for (i=0;i<Dim;i++)
-		M3[i] = (float *)calloc(1,Dim*sizeof(float));
+		M3[i] = new float();
 
 	for(i=0;i<Dim;i++){
 		for(ii=0;ii<Dim;ii++){
@@ -124,7 +124,7 @@ float *M_a::sum_v (float *v1,float *v2){
 	int i;
 	float *v3;
 
-	v3 = (float *)malloc(Dim* sizeof(float));
+	v3 = new float[Dim];
 	for(i=0;i<Dim;i++)  v3[i] = v1[i]+v2[i];
 	return v3;
 }

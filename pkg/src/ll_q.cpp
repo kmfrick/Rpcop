@@ -6,7 +6,7 @@ extern "C" {
 
 ll_q::ll_q(int np){
 	npunts = np;
-	Topleft = (node *) calloc(1,sizeof(node));// topleft no contendra info
+	Topleft = new node(); // does not contain info
 }
 
 ll_q::~ll_q(){    
@@ -16,7 +16,7 @@ ll_q::~ll_q(){
 	while(pt!=NULL){
 		auxpt = pt;
 		pt = pt->seg;
-		free(auxpt);
+		delete auxpt;
 	}
 }
 
@@ -27,7 +27,7 @@ void ll_q::add_ord(float info){
 	while(pt->seg && pt->seg->info> info){
 		pt = pt->seg;
 	}
-	newpt = (node *) malloc(sizeof(node));
+	newpt = new node;
 	newpt->info = info;
 	newpt->seg = pt->seg;
 	pt->seg = newpt;

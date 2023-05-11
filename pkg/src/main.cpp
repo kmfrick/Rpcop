@@ -32,7 +32,7 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d, float 
 	int Dim = x.ncol();
 	ll_pt = new ll_p(Dim);
 	for (i = 0; i < x.nrow(); i++) {
-		float *d_punt = (float*)malloc((Dim + 1) * sizeof(float));
+		float *d_punt = new float[Dim + 1];
 		d_punt[0] = 1; d_punt++;// coordenada -1 pel pes.
 		for (int j = 0; j < x.ncol(); j++) {
 			d_punt[j] = x(i, j);
@@ -42,16 +42,16 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d, float 
 	if (ll_pt->n_punts()< NPTMIN*Dim) {
 		Rcpp::stop("Warning: Not enough points in data matrix. At least %d points are needed for dimension %d.\n", NPTMIN * Dim, Dim);
 	}
-	Ma = (float **) malloc(Dim*sizeof(float *));
+	Ma = new float*[Dim];
 	if (Ma == NULL) {
 		Rcpp::stop("Could not allocate Ma.\n");
 	}
 
 	for (i=0;i<Dim;i++){
-		Ma[i] = (float *)calloc(Dim,sizeof(float));
+		Ma[i] = new float[Dim]();
 		Ma[i][i]=1;
 	}
-	mx = (float *) calloc(Dim,sizeof(float));
+	mx = new float[Dim]();
 	if (mx == NULL) {
 		Rcpp::stop("Could not allocate mx.\n");
 	}
@@ -62,7 +62,7 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d, float 
 	psp->rebre_M_a(new M_a(Dim,0,Ma,mx));
 	vtg = psp->obtenir_VTG(&mx);
 	int nrow, ncol;
-	float *out = (float*)malloc((2 * Dim + 5) * x.nrow() * sizeof(float));
+	float *out = new float[(2 * Dim + 5) * x.nrow()];
 	if (out == NULL) {
 		Rcpp::stop("Could not allocate out.\n");
 	}
