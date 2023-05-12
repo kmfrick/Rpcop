@@ -45,12 +45,12 @@ M_b::M_b(int d, float *b) {
   v_acum1 = new float[Dim]();
   Mb[0] = norma_v(Mb[0]);
   for (i = 1; i < Dim; i++) {
-    delete v_acum1;
+    delete[] v_acum1;
     v_acum1 = new float[Dim]();
     for (j = 0; j < i; j++) {
       mesc = mult_esc(mult_v(Mb[i], Mb[j]), Mb[j]);
       v_acum2 = sum_v(v_acum1, mesc);
-      delete v_acum1;
+      delete[] v_acum1;
       v_acum1 = v_acum2;
     }
     v_dif = dif_v(Mb[i], v_acum1);
@@ -91,9 +91,9 @@ M_b::~M_b() {
       delete MId[i];
     }
 
-  delete Mb;
-  delete MInv;
-  delete MId;
+  delete[] Mb;
+  delete[] MInv;
+  delete[] MId;
 
   // delete xo xo  es gestiona desde espai (calcular_corba_en_sentit(),
   // calcular_corba_en_sentit_contrari()).
@@ -145,7 +145,7 @@ void M_b::calcular_la_inversa() {
   if (MInv) {
     for (i = 0; i < Dim; i++)
       delete MInv[i];
-    delete MInv;
+    delete[] MInv;
   }
 
   /* copiar la Mb  */ // ya que sera modificada por inv()
@@ -178,7 +178,7 @@ float *M_b::aplicar(
   // la primera coordenada sera la distancia al pla, les seguents, les del punt
   // al pla inferior.
 
-  delete p2;
+  delete[] p2;
   return p3;
 }
 
@@ -192,7 +192,7 @@ float *M_b::desaplicar(float *punt) { /* operación inversa a aplicar */
   // la primera coordenada sera la distancia al pla, les seguents, les del punt
   // al pla inferior.
 
-  delete p2;
+  delete[] p2;
   return p3;
 }
 

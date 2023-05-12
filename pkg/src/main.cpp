@@ -6,10 +6,10 @@ extern "C" {
 
 //' @title pcop_backend
 //' @description Computes a principal curve as defined in Delicado (2001). DO
-//NOT use this function unless you know what you are doing. Use `pcop()`
-//instead. ' <doi: 10.1007/s001800300145> ' @param x    See `pcop()` ' @param
-//c_h  See `pcop()` ' @param c_d  See `pcop()` ' @return A numeric matrix to be
-//parsed by `pcop()`.
+// NOT use this function unless you know what you are doing. Use `pcop()`
+// instead. ' <doi: 10.1007/s001800300145> ' @param x    See `pcop()` ' @param
+// c_h  See `pcop()` ' @param c_d  See `pcop()` ' @return A numeric matrix to be
+// parsed by `pcop()`.
 // [[Rcpp::export]]
 Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
                                  float c_h) {
@@ -19,7 +19,6 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
   float **Ma;
   int i;
   ll_p *ll_pt;
-  //float vtg;
   float *mx;
 
   // inicialización valores por defecto, despues en el fichero de setup puede
@@ -63,7 +62,7 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
   psp->inicializar_nparts_ch_cd(profreq, nparts, c_h, c_d);
   // fin
   psp->rebre_M_a(new M_a(Dim, 0, Ma, mx));
-  //vtg = psp->obtenir_VTG(&mx);
+  static_cast<void>(psp->obtenir_VTG(&mx)); // static_cast to ignore return value
   int nrow, ncol;
   float *out = new float[(2 * Dim + 5) * x.nrow()];
   if (out == NULL) {
