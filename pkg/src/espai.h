@@ -15,7 +15,7 @@ extern "C" {
 // los subespacios,2= sobre las superficies de los subspacios.....
 
 #define C_EPS 0.05 // Sin recursividad, el valor 0.01 fue muy bien
-#define NPTMIN 50  // n puntos mínimo para calcular la curva
+#define NPTMIN 50  // n puntos mnimo para calcular la curva
 #define LD 0.5
 
 #define PINZA_MAX PI / 4
@@ -122,7 +122,7 @@ public:
   ll_pnt<pop> *ll_pop; // ###
 
   // modificado 16/4/2002 inicializamos las variables
-  // operacions inicialització i extracció d'informació només per el 1er espai.
+  // operacions inicialitzaci i extracci d'informaci noms per el 1er espai.
   void inicializar_nparts_ch_cd(int profreq, int nparts, float c_h, float c_d);
   void obtenir_data(float *, int *, int *);
   // fin

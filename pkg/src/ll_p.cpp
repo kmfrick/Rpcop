@@ -75,7 +75,7 @@ ll_p::~ll_p() {
       delete auxpt;
     }
 
-  //	delete (max);   // les eliminar�n l'espai a qui li pasem, quan les hagi
+  //	delete (max);   // les eliminarn l'espai a qui li pasem, quan les hagi
   // utilitzat. 	delete (min);
 }
 
@@ -92,7 +92,7 @@ void ll_p::add_ordX_principal(float *vect) {
           (0.5 *
            (act_node->coord[X] -
             topleft->seg[DRETA]->coord[X]))) { // si es mes gran que el punt mig
-                                               // comen�em pel canto dret
+                                               // comenem pel canto dret
 
     while (vect[X] < act_node->coord[X]) {
       act_node = act_node->seg[ESQUERRA];
@@ -128,7 +128,7 @@ void ll_p::add_ordX_principal(float *vect) {
     vn_punts++;
   }
 
-  /* buscar max , min, xmean */ // com que ll_p es tot un cluster ser�n tb el
+  /* buscar max , min, xmean */ // com que ll_p es tot un cluster sern tb el
                                 // max i mix del cluster
   for (i = 0; i < Dim; i++) {
     if (max[i] < vect[i])
@@ -149,7 +149,7 @@ void ll_p::donar_max_min_xomig(float **mx, float **mn, float **xm, float *s_d) {
 
   *mx = max;
   *mn = min;
-  *xm = x_mean; // punt de ll_p m�s proper al xmean te�ric. xmean ponderat en
+  *xm = x_mean; // punt de ll_p ms proper al xmean teric. xmean ponderat en
                 // cas de pertanyer a un spai final.
   *s_d = suma_d;
 }
@@ -231,7 +231,7 @@ float ll_p::inicialitzacio_principal() {
   auxx_mean = x_mean; // x_mean teoric.
   x_mean = mult_esc(1.0 / sum_w, auxx_mean);
   delete auxx_mean;
-  quartiles = new ll_q(vn_punts); // li pasem el n� de punts de l'espai
+  quartiles = new ll_q(vn_punts); // li pasem el n de punts de l'espai
   obtener_quartiles(quartiles);   // calculant el min. spanning tree
   dmax = quartiles->dmax();
   x_mean = obtener_satelites(); // nos basamos en dmax para obtener los
@@ -241,7 +241,7 @@ float ll_p::inicialitzacio_principal() {
 }
 
 void ll_p::inicialitzacio_final() {
-  /* no fem ni spanning tree, ni satelits, don� no calcularem cap corba per
+  /* no fem ni spanning tree, ni satelits, don no calcularem cap corba per
    * aquest spai */
   float *auxx_mean;
 
@@ -253,7 +253,7 @@ void ll_p::inicialitzacio_final() {
 }
 
 void ll_p::mstinsertar(node *pt) {
-  pt->marca = -1; // despr�s tornarem a inicialitzar a 0 a calcular_satelits()
+  pt->marca = -1; // desprs tornarem a inicialitzar a 0 a calcular_satelits()
                   // per a candidat_visitat().
 
   ((node *)pt->noin[ESQUERRA])->noin[DRETA] = ((node *)pt->noin[DRETA]);
@@ -294,9 +294,9 @@ void ll_p::obtener_quartiles(
   }
   mstinsertar(xpt); // insertem al mst el xpost anterior, per no desvincular-lo
                     // de la llista noin
-  xpt = xpost;      // xpost ser� el siguiente punto ha insertar
+  xpt = xpost;      // xpost ser el siguiente punto ha insertar
   dant = dpost;
-  aux_npunts--; // restamos uno de m�s porque la �ltima insercion en ll_q se
+  aux_npunts--; // restamos uno de ms porque la ltima insercion en ll_q se
                 // realiza en el postproceso
 
   /* cuerpo principal */
@@ -324,7 +324,7 @@ void ll_p::obtener_quartiles(
       xact = xact->seg[DRETA];
     }
 
-    if (xact->coord[X] - xpt->coord[X] >= dant) { // hemos acotado el dant m�n
+    if (xact->coord[X] - xpt->coord[X] >= dant) { // hemos acotado el dant mn
       xact = nxtnomstin; // ens coloquem a l'ultim no insertat
       while (xact->coord[X] - xpt->coord[X] < dpost &&
              xact != topright) { // si tb hemos acotado el dpost min, saldremos
@@ -335,7 +335,7 @@ void ll_p::obtener_quartiles(
         }
         xact = (node *)xact->noin[DRETA];
       }
-    } else { // hemos acotado el dpost m�n
+    } else { // hemos acotado el dpost mn
       while (xact->coord[X] - xpt->coord[X] < dant) {
         if ((mstinsertat(xact)) &&
             ((d = distancia(xact->coord, xpt->coord)) < dant))
@@ -360,7 +360,7 @@ void ll_p::obtener_quartiles(
       xact = xact->seg[ESQUERRA];
     }
 
-    if (xpt->coord[X] - xact->coord[X] >= dant) { // hemos acotado el dant m�n
+    if (xpt->coord[X] - xact->coord[X] >= dant) { // hemos acotado el dant mn
       xact = nxtnomstin; // ens coloquem a l'ultim no insertat
       while (
           xpt->coord[X] - xact->coord[X] <
@@ -371,7 +371,7 @@ void ll_p::obtener_quartiles(
         }
         xact = (node *)xact->noin[ESQUERRA];
       }
-    } else { // hemos acotado el dpost m�n
+    } else { // hemos acotado el dpost mn
       while (xpt->coord[X] - xact->coord[X] < dant) {
         if ((mstinsertat(xact)) &&
             ((d = distancia(xact->coord, xpt->coord)) < dant))
@@ -380,7 +380,7 @@ void ll_p::obtener_quartiles(
       }
     }
 
-    /*tratamiento final de iteraci�n */
+    /*tratamiento final de iteracin */
 
     llqt->add_ord(dant);
     suma_d += dant;
@@ -536,7 +536,7 @@ float *ll_p::seguent_candidat_clt(int validacio) {
             semilla = NULL;
           }
         } while (!candidat); // si el candidat en la 1era dir. es bueno,
-                             // realizamos la evaluaci�n de candidat 2 veces.
+                             // realizamos la evaluacin de candidat 2 veces.
       } else
         semilla = NULL; // nos queda por tratar la 2nda dir.
     } else
@@ -551,7 +551,7 @@ float *ll_p::seguent_candidat_clt(int validacio) {
           semilla = NULL;
         }
       } while (!candidat); // si el candidat en la 1era dir. es bueno,
-                           // realizamos la evaluaci�n de candidat 2 veces.
+                           // realizamos la evaluacin de candidat 2 veces.
   } while (candidat->ptnode->marca == numcl);
 
   return candidat->ptnode->coord;

@@ -40,7 +40,7 @@ M_b::M_b(int d, float *b) {
 
   Mb[0] = b; // reusamos el vector b pasado por parametro.
 
-  /* proceso de ortonormalización de Gram-Schmidt */
+  /* proceso de ortonormalizacin de Gram-Schmidt */
 
   v_acum1 = new float[Dim]();
   Mb[0] = norma_v(Mb[0]);
@@ -182,7 +182,7 @@ float *M_b::aplicar(
   return p3;
 }
 
-float *M_b::desaplicar(float *punt) { /* operación inversa a aplicar */
+float *M_b::desaplicar(float *punt) { /* operacin inversa a aplicar */
   float *p2;
   float *p3;
 
@@ -199,19 +199,19 @@ float *M_b::desaplicar(float *punt) { /* operación inversa a aplicar */
 void M_b::rebre_xo(float *punt) {
   // se ejecutara una vez por avance_cluster() y todas las veces que el pop
   // candidato cruce el hiperplano del pop anterior.
-  // free xo;    //  no fa falta alliverar l'espai. O bé ha estat eliminat al
+  // free xo;    //  no fa falta alliverar l'espai. O b ha estat eliminat al
   // crear el nou xo, o es un xo compartir amb la matriu del pop anterior.
   xo = punt;
 }
 
-/* Ma es la matriu que l'espai inferior  necesacitará per pasar*/
+/* Ma es la matriu que l'espai inferior  necesacitar per pasar*/
 /* els seus punts i vectors finals a les coordenades originals    */
 
 M_a *M_b::donar_M_a(M_a *Ma) {
-  // se ejecutara como máximo una vez si resulta ser el M_b optimo.
+  // se ejecutara como mximo una vez si resulta ser el M_b optimo.
 
   return Ma->donar_M_a(
-      Mb, xo); // xo, en aquest punt haurá de ser de tamany Dim+prof.
+      Mb, xo); // xo, en aquest punt haur de ser de tamany Dim+prof.
 }
 
 float *M_b::donar_bopt() { return Mb[0]; }
@@ -241,7 +241,7 @@ float **M_b::inv(float **M) {
   /*  for (i=0;i<Dim;i++){
       j=(i+1)%Dim;
       aux = j;            // si no se vuelca la  j, el % no funciona
-     correctamente borlan c++ !!¿¿??? while (j!=i){ Mji = M[j][i];
+     correctamente borlan c++ !!??? while (j!=i){ Mji = M[j][i];
       for(ii=0;ii<Dim;ii++){
       Inv[j][ii]= (Inv[j][ii]*M[i][i])-(Inv[i][ii]*Mji);   // no pot modificarse
      M avans de Inv M[j][ii]= (M[j][ii]*M[i][i])-(M[i][ii]*Mji);

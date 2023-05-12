@@ -30,7 +30,7 @@ public:
              float angle); // s'aplicara un gir a Mb per l'eix o dimensio donat.
                            // L'angle d'aquests girs sera el que diferenci un
                            // objecte matriu resultant d'un altre
-  M_b *replicar();         // fará una copia de la M_b;
+  M_b *replicar();         // far una copia de la M_b;
   void calcular_la_inversa(); // calculamos la inversa  realizados los giros de
                               // Mb y antes de aplicarla sobre los puntos. Si el
                               // Mb resulta optimo se calculara mas de 1 vez,

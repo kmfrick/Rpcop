@@ -45,7 +45,7 @@ public:
   node* resetpt() { return Topleft; }
 
   node *noend(node *pt) {
-    return (pt->seg->seg); // a l'ultim elem. contindrà info, s'haurà
+    return (pt->seg->seg); // a l'ultim elem. contindr info, s'haur
                                      // de tractar apart.
     // si pt->seg == NULL el camp info de pt estara buit
   }

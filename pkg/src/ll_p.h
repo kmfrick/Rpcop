@@ -22,7 +22,7 @@ private:
   float dmax;
   int orcluster; // primero damos los candidatos a la derecha y luego a la
                  // izquierda de xo sobre la coordenada X
-  int numcl;     // lleva la cuenta del n� de rondas
+  int numcl;     // lleva la cuenta del n de rondas
   float sum_w;   // suma de los pesos de los puntos
   float suma_d;
 
@@ -30,7 +30,7 @@ private:
     float *coord;
     int marca;
     node *seg[2];
-    void *noin[2]; // 1�:enlaza nodos fuera del spamming tree. 2�:enlaza
+    void *noin[2]; // 1:enlaza nodos fuera del spamming tree. 2:enlaza
                    // satelites del nodo
   } node;
 
@@ -64,7 +64,7 @@ private:
   int mstinsertat(node *pt); // mira si esta insertat al min. spanning tree */
 
   // inicialitzacio
-  // float *calcular_xomig_corba(); // cerca el punt origen de la corba (el m�s
+  // float *calcular_xomig_corba(); // cerca el punt origen de la corba (el ms
   // proper a xmean)
   void calcular_max_min_cluster();
 
@@ -95,7 +95,7 @@ public:
   // modificadoras
   void
   trobar_primer_candidat_clt(float *xo); // cerca el primer candidat al cluster.
-  float *canviar_orientacio_clt(); // comen�a la cerca en sentit contrari, torna
+  float *canviar_orientacio_clt(); // comena la cerca en sentit contrari, torna
                                    // el 1er candidat
 
   // consultoras
@@ -103,7 +103,7 @@ public:
   float *primer_candidat_clt(); // retorna el primer candidat al cluster.
   float *seguent_candidat_clt(int validacio); // cerca el seguent candidat i li
                                               // pasan la validacio del ultim
-  int n_punts();                              // n� punts del cluster
+  int n_punts();                              // n punts del cluster
   void donar_max_min_xomig(float **mx, float **mn, float **xm, float *s_d);
 
   // consultoras  amb punter

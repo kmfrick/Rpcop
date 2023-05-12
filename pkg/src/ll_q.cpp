@@ -36,8 +36,8 @@ float ll_q::dmax() {
   int limite, i;
   node *nd;
 
-  limite = npunts * 0.00; // a un dmax més petit -> calculs més rapids, pero un
-                          // cluster més restrictiu.
+  limite = npunts * 0.00; // a un dmax ms petit -> calculs ms rapids, pero un
+                          // cluster ms restrictiu.
 
   nd = Topleft->seg;
   for (i = 1; i < limite; i++) {

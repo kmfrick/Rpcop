@@ -21,7 +21,7 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
   ll_p *ll_pt;
   float *mx;
 
-  // inicialización valores por defecto, despues en el fichero de setup puede
+  // inicializacin valores por defecto, despues en el fichero de setup puede
   // que cambien modificado 16/4/2002
   // PROFREQ =1;
   // NPARTs = 4;
