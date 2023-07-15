@@ -230,7 +230,7 @@ float ll_p::inicialitzacio_principal() {
 
   auxx_mean = x_mean; // x_mean teoric.
   x_mean = mult_esc(1.0 / sum_w, auxx_mean);
-  delete auxx_mean;
+  delete[] auxx_mean;
   quartiles = new ll_q(vn_punts); // li pasem el n de punts de l'espai
   obtener_quartiles(quartiles);   // calculant el min. spanning tree
   dmax = quartiles->dmax();
@@ -249,7 +249,7 @@ void ll_p::inicialitzacio_final() {
   x_mean = mult_esc(
       1.0 / sum_w,
       auxx_mean); // el xmean el dividim per la suma de pesos dels punts.
-  delete auxx_mean;
+  delete[] auxx_mean;
 }
 
 void ll_p::mstinsertar(node *pt) {

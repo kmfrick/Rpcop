@@ -2,7 +2,7 @@ Package: Rpcop
 Type: Package
 Title: Principal Curves of Oriented Points
 Version: 1.1
-Date: 2023-05-11
+Date: 2023-07-15
 Authors@R:
     c(person(given = "Pedro",
              family = "Delicado",
@@ -30,4 +30,3 @@ Imports: Rcpp (>= 1.0.7)
 LinkingTo: Rcpp
 Depends: princurve
 RoxygenNote: 7.1.2
-SystemRequirements: C++11

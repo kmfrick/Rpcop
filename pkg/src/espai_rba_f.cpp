@@ -43,7 +43,6 @@ espai::~espai() {
 }
 
 float espai::obtenir_VTG(float **xm) {
-  float l;
   if ((profundidad == PROF_REQ) || (Dim == 1) ||
       (ll_pt->n_punts() < NPTMIN * Dim)) { // falta verificacio de que son prou
                                            // punts tenint en compte la dim
@@ -64,11 +63,11 @@ float espai::obtenir_VTG(float **xm) {
     ll_pt->inicialitzacio_principal();
     calcular_htail_delta_xomig_epsx();
 
-    l = calcular_corba_en_un_sentit(); // al fer cadascuna de les corbes dels
+    static_cast<void>(calcular_corba_en_un_sentit()); // al fer cadascuna de les corbes dels
                                        // subespais borrem el llpt que li hem
                                        // pasat.
     /* girem  */
-    l -= calcular_corba_en_sentit_contrari(); // pot no donar cap pop.
+    static_cast<void>(calcular_corba_en_sentit_contrari()); // pot no donar cap pop.
 
     GTV = finalitzacio(); /* d'on obtenim la VTG de la corba */
   }

@@ -69,7 +69,7 @@ M_b::M_b(int d, float **n_M, float *n_xo) {
   MInv = NULL;
 
   for (i = 0; i < Dim; i++) {
-    MId[i] = new float();
+    MId[i] = new float[Dim];
   }
   for (i = 0; i < Dim; i++) {
     MId[i][i] = 1;
@@ -282,7 +282,7 @@ float **M_b::MxM(float **M1, float **M2) {
   M3 = new float *[Dim];
 
   for (i = 0; i < Dim; i++)
-    M3[i] = new float();
+    M3[i] = new float[Dim];
 
   for (i = 0; i < Dim; i++) {
     for (ii = 0; ii < Dim; ii++) {

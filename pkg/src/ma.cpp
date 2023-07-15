@@ -103,7 +103,7 @@ float **M_a::MxM(float **M1, float **M2) {
   M3 = new float *[Dim];
 
   for (i = 0; i < Dim; i++)
-    M3[i] = new float();
+    M3[i] = new float[Dim];
 
   for (i = 0; i < Dim; i++) {
     for (ii = 0; ii < Dim; ii++) {
