@@ -2,14 +2,23 @@ extern "C" {
 #include <stdlib.h>
 }
 #include "espai.h"
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wunknown-warning-option"
+#endif
 #include <Rcpp.h>
+#ifdef __clang__
+# pragma clang diagnostic pop
+#endif
 
 //' @title pcop_backend
-//' @description Computes a principal curve as defined in Delicado (2001). DO
-// NOT use this function unless you know what you are doing. Use `pcop()`
-// instead. ' <doi: 10.1007/s001800300145> ' @param x    See `pcop()` ' @param
-// c_h  See `pcop()` ' @param c_d  See `pcop()` ' @return A numeric matrix to be
-// parsed by `pcop()`.
+//' @name pcop_backend
+//' @description Internal backend used by \code{pcop()} to compute the principal curve defined in Delicado (2001) \doi{10.1007/s001800300145}.
+//' @param x Numeric matrix of input points; see \code{pcop()}.
+//' @param c_d Distance scaling parameter passed from \code{pcop()}.
+//' @param c_h Bandwidth scaling parameter passed from \code{pcop()}.
+//' @return Numeric matrix consumed by \code{pcop()}.
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
                                  float c_h) {

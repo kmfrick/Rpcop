@@ -3,7 +3,14 @@
 // ### a: un pop no puede retroceder.
 
 #include "espai.h"
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wunknown-warning-option"
+#endif
 #include <Rcpp.h>
+#ifdef __clang__
+# pragma clang diagnostic pop
+#endif
 #include <cstdlib>
 
 #define PI M_PI
