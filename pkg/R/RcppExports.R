@@ -7,7 +7,8 @@
 #' @param c_h  See `pcop()`
 #' @param c_d  See `pcop()`
 #' @return A numeric matrix to be parsed by `pcop()`.
+#' @keywords internal
+#' @noRd
 pcop_backend <- function(x, c_d, c_h) {
     .Call('_Rpcop_pcop_backend', PACKAGE = 'Rpcop', x, c_d, c_h)
 }
-
