@@ -108,9 +108,8 @@ public:
 
   // consultoras  amb punter
 
-  node* resetpt() { return topleft->seg[DRETA]; }
+  node *resetpt() { return topleft->seg[DRETA]; }
   void *noend(node *pt);
   float *llpt(node *pt);
   void advpt(node **pt);
-
 };

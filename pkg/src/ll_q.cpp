@@ -6,6 +6,7 @@ extern "C" {
 ll_q::ll_q(int np) {
   npunts = np;
   Topleft = new node(); // does not contain info
+  Topleft->seg = nullptr;
 }
 
 ll_q::~ll_q() {

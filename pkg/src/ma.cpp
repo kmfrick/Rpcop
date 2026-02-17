@@ -82,12 +82,18 @@ float *M_a::Mxv(float **M1, float *v) {
   // vxM, trabajamos con vectores fila.
   int i, j;
   float sum;
-  float *v3 = new float[Dim];
+  float *v3 = new float[Dim]();
+
+  if (!M1 || !v) {
+    return v3;
+  }
 
   for (i = 0; i < Dim; i++) {
     sum = 0;
     for (j = 0; j < Dim; j++) {
-      sum += v[j] * M1[j][i];
+      if (M1[j]) {
+        sum += v[j] * M1[j][i];
+      }
     }
     v3[i] = sum;
   }
@@ -103,13 +109,19 @@ float **M_a::MxM(float **M1, float **M2) {
   M3 = new float *[Dim];
 
   for (i = 0; i < Dim; i++)
-    M3[i] = new float[Dim];
+    M3[i] = new float[Dim]();
+
+  if (!M1 || !M2) {
+    return M3;
+  }
 
   for (i = 0; i < Dim; i++) {
     for (ii = 0; ii < Dim; ii++) {
       sum = 0;
       for (j = 0; j < Dim; j++) {
-        sum += M1[i][j] * M2[j][ii];
+        float lhs = M1[i] ? M1[i][j] : 0.0f;
+        float rhs = M2[j] ? M2[j][ii] : 0.0f;
+        sum += lhs * rhs;
       }
       M3[i][ii] = sum;
     }
@@ -122,6 +134,14 @@ float *M_a::sum_v(float *v1, float *v2) {
   float *v3;
 
   v3 = new float[Dim];
+  if (!v1 || !v2) {
+    for (i = 0; i < Dim; i++) {
+      float lhs = v1 ? v1[i] : 0.0f;
+      float rhs = v2 ? v2[i] : 0.0f;
+      v3[i] = lhs + rhs;
+    }
+    return v3;
+  }
   for (i = 0; i < Dim; i++)
     v3[i] = v1[i] + v2[i];
   return v3;

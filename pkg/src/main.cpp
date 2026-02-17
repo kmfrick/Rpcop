@@ -3,19 +3,19 @@ extern "C" {
 }
 #include "espai.h"
 #ifdef __clang__
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
 #endif
 #include <Rcpp.h>
 #ifdef __clang__
-# pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
 
 //' @title pcop_backend
 //' @name pcop_backend
 //' @description Internal backend used by \code{pcop()} to compute the principal curve defined in Delicado (2001) \doi{10.1007/s001800300145}.
 //' @param x Numeric matrix of input points; see \code{pcop()}.
-//' @param c_d Distance scaling parameter passed from \code{pcop()}.
+//' @param c_d Distance/scaling parameter passed from \code{pcop()}.
 //' @param c_h Bandwidth scaling parameter passed from \code{pcop()}.
 //' @return Numeric matrix consumed by \code{pcop()}.
 //' @keywords internal
@@ -71,7 +71,8 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
   psp->inicializar_nparts_ch_cd(profreq, nparts, c_h, c_d);
   // fin
   psp->rebre_M_a(new M_a(Dim, 0, Ma, mx));
-  static_cast<void>(psp->obtenir_VTG(&mx)); // static_cast to ignore return value
+  static_cast<void>(
+      psp->obtenir_VTG(&mx)); // static_cast to ignore return value
   int nrow, ncol;
   float *out = new float[(2 * Dim + 5) * x.nrow()];
   if (out == NULL) {
@@ -81,6 +82,7 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
 
   delete psp;
   Rcpp::NumericMatrix proy(nrow, ncol, out);
+  delete[] out;
   proy = transpose(proy);
   return proy;
 }

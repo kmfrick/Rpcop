@@ -5,7 +5,7 @@
 #' @name pcop_backend
 #' @description Internal backend used by \code{pcop()} to compute the principal curve defined in Delicado (2001) \doi{10.1007/s001800300145}.
 #' @param x Numeric matrix of input points; see \code{pcop()}.
-#' @param c_d Distance scaling parameter passed from \code{pcop()}.
+#' @param c_d Distance/scaling parameter passed from \code{pcop()}.
 #' @param c_h Bandwidth scaling parameter passed from \code{pcop()}.
 #' @return Numeric matrix consumed by \code{pcop()}.
 #' @keywords internal

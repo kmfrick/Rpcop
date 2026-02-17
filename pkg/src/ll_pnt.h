@@ -16,6 +16,8 @@ private:
 public:
   ll_pnt() {
     Topleft = new node();
+    Topleft->info = nullptr;
+    Topleft->seg = nullptr;
     Topright = Topleft;
   }
 
@@ -36,17 +38,20 @@ public:
   }
 
   void addrev(T *info) {
-    newTopleft = new node;
+    newTopleft = new node();
     newTopleft->info = info;
     newTopleft->seg = Topleft;
     Topleft = newTopleft;
   }
 
-  node* resetpt() { return Topleft; }
+  node *resetpt() { return Topleft; }
 
   node *noend(node *pt) {
+    if (!pt || !pt->seg) {
+      return nullptr;
+    }
     return (pt->seg->seg); // a l'ultim elem. contindr info, s'haur
-                                     // de tractar apart.
+                           // de tractar apart.
     // si pt->seg == NULL el camp info de pt estara buit
   }
 

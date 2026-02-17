@@ -7,12 +7,16 @@ ll_p::ll_p(int d) {
   numcl = 0;
   sum_w = 0; // suma dels pesos dels punts
   suma_d = 0;
+  xorig = NULL;
+  xoant = NULL;
+  semilla = NULL;
+  candidat = NULL;
 
-  topleft = new node;
+  topleft = new node();
   topleft->coord = new float[Dim + 1]();
   topleft->coord++;
   topleft->coord[X] = -1 * INF;
-  topright = new node;
+  topright = new node();
   topright->coord = new float[Dim + 1]();
   topright->coord++; // Dim +1 para incluir los pesos
   topright->coord[X] = INF;
@@ -50,8 +54,9 @@ ll_p::~ll_p() {
     while (pt) {
       auxpt = pt;
       pt = pt->seg[DRETA];
-      delete ((auxpt->coord) -
-              1); // per corregir la posicio que deixem lliure al baixar a Dim-1
+      delete[] (
+          (auxpt->coord) -
+          1); // per corregir la posicio que deixem lliure al baixar a Dim-1
       delete auxpt;
     }
   else
@@ -70,8 +75,9 @@ ll_p::~ll_p() {
       }
       auxpt = pt;
       pt = pt->seg[DRETA];
-      delete ((auxpt->coord) -
-              1); // per corregir la posicio que deixem lliure al baixar a Dim-1
+      delete[] (
+          (auxpt->coord) -
+          1); // per corregir la posicio que deixem lliure al baixar a Dim-1
       delete auxpt;
     }
 
@@ -424,6 +430,8 @@ float *ll_p::obtener_satelites() {
   float d, dpost = INF;
   node *xpt = topleft->seg[DRETA];
   node *xact = xpt->seg[DRETA];
+  node *fallback = (xpt && xpt != topright) ? xpt : NULL;
+  xorig = NULL;
 
   while (xpt->seg[DRETA]) {
     while (xact->coord[X] - xpt->coord[X] < dmax) {
@@ -442,10 +450,16 @@ float *ll_p::obtener_satelites() {
     xpt = xpt->seg[DRETA];
     xact = xpt->seg[DRETA];
   }
+  if (!xorig || xorig == topright) {
+    xorig = fallback;
+  }
   xoant = xorig;
-  delete x_mean; // borrem l'antic xmean teoric i retornem el xorig practic
 
-  return xorig->coord;
+  if (xoant && xoant->coord) {
+    delete[] x_mean; // borrem l'antic xmean teoric i retornem el xorig practic
+    return xoant->coord;
+  }
+  return x_mean;
 }
 
 void ll_p::add_satelit(int or_, node *ptor, node *ptdsti) {
@@ -464,18 +478,31 @@ void ll_p::trobar_primer_candidat_clt(float *xm) {
   node *xtop;
   node *xodmax;
 
+  if (!xm || !xoant || !xoant->coord) {
+    return;
+  }
+
   orcluster = (xm[X] > xoant->coord[X]); // true ->DRETA, false ->ESQUERRA
-  while (fabs(xm[X] - xoant->coord[X]) > dmax)
+  while (xoant->seg[orcluster] && fabs(xm[X] - xoant->coord[X]) > dmax)
     xoant = xoant->seg[orcluster];
+  if (!xoant || !xoant->coord) {
+    return;
+  }
   xodmax = xoant;
 
-  while (xoant->marca < 1)
+  while (xoant->seg[orcluster] && xoant->marca < 1)
     xoant = xoant->seg[orcluster]; // no exigimos conectado por derecha y
                                    // izquierda. solo estar conectado
+  if (!xoant || !xoant->coord) {
+    return;
+  }
   dtop = distancia(xm, xoant->coord);
   xtop = xoant;
-  while (fabs(xoant->coord[X] - xm[X]) < dtop) {
+  while (xoant->seg[orcluster] && fabs(xoant->coord[X] - xm[X]) < dtop) {
     xoant = xoant->seg[orcluster];
+    if (!xoant || !xoant->coord) {
+      break;
+    }
     if (((d = distancia(xm, xoant->coord)) < dtop) &&
         (xoant->marca > 0)) { // elim.(xoant->marca>0)
       dtop = d;
@@ -485,8 +512,12 @@ void ll_p::trobar_primer_candidat_clt(float *xm) {
   if (dtop > dmax) { // per si hi ha dos clusters a dist>dmax de xm
     xoant = xodmax;
     orcluster = (orcluster + 1) % 2;
-    while (fabs(xoant->coord[X] - xm[X]) < dtop) {
+    while (xoant && xoant->coord && xoant->seg[orcluster] &&
+           fabs(xoant->coord[X] - xm[X]) < dtop) {
       xoant = xoant->seg[orcluster];
+      if (!xoant || !xoant->coord) {
+        break;
+      }
       if (((d = distancia(xm, xoant->coord)) < dtop) &&
           (xoant->marca > 0)) { // elim.(xoant->marca>0)
         dtop = d;
@@ -494,17 +525,28 @@ void ll_p::trobar_primer_candidat_clt(float *xm) {
       }
     }
   }
-  xoant = xtop;
+  if (xtop) {
+    xoant = xtop;
+  }
 }
 
 float *ll_p::primer_candidat_clt() {
   numcl++;
+  semilla = NULL;
+  candidat = NULL;
+
+  if (!xoant) {
+    return NULL;
+  }
 
   if (!(candidat = (node_satelit *)xoant->noin[orcluster])) {
     orcluster = (orcluster + 1) % 2;
     candidat = (node_satelit *)
                    xoant->noin[orcluster]; // como minim tindra un satelit, sino
                                            // no pertenyeria al cluster.
+  }
+  if (!candidat || !candidat->ptnode || !candidat->ptnode->coord) {
+    return NULL;
   }
   semilla = xoant;
   return candidat->ptnode->coord; // ### no inserta el primer satelite aunque

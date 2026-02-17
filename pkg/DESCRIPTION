@@ -29,6 +29,8 @@ Description: Principal curves generalize the notion of a first principal compone
 License: GPL (>= 2)
 Depends: R (>= 3.5.0)
 Imports: Rcpp (>= 1.0.7), princurve
+Suggests: testthat (>= 3.0.0)
 LinkingTo: Rcpp
 Encoding: UTF-8
 RoxygenNote: 7.3.3
+Config/testthat/edition: 3

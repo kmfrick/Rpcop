@@ -81,14 +81,14 @@ M_b::~M_b() {
 
   if (MInv)
     for (i = 0; i < Dim; i++) {
-      delete Mb[i];
-      delete MInv[i];
-      delete MId[i];
+      delete[] Mb[i];
+      delete[] MInv[i];
+      delete[] MId[i];
     }
   else
     for (i = 0; i < Dim; i++) {
-      delete Mb[i];
-      delete MId[i];
+      delete[] Mb[i];
+      delete[] MId[i];
     }
 
   delete[] Mb;
@@ -144,7 +144,7 @@ void M_b::calcular_la_inversa() {
 
   if (MInv) {
     for (i = 0; i < Dim; i++)
-      delete MInv[i];
+      delete[] MInv[i];
     delete[] MInv;
   }
 
@@ -164,7 +164,7 @@ void M_b::calcular_la_inversa() {
 
   /* borrar c_Mb  */
   for (i = 0; i < Dim; i++)
-    delete c_Mb[i];
+    delete[] c_Mb[i];
   delete[] c_Mb;
 }
 
@@ -261,12 +261,18 @@ float *M_b::Mxv(float **M1, float *v) {
   // vxM, trabajamos con vectores fila.
   int i, j;
   float sum;
-  float *v3 = new float[Dim];
+  float *v3 = new float[Dim]();
+
+  if (!M1 || !v) {
+    return v3;
+  }
 
   for (i = 0; i < Dim; i++) {
     sum = 0;
     for (j = 0; j < Dim; j++) {
-      sum += v[j] * M1[j][i];
+      if (M1[j]) {
+        sum += v[j] * M1[j][i];
+      }
     }
     v3[i] = sum;
   }
@@ -282,13 +288,19 @@ float **M_b::MxM(float **M1, float **M2) {
   M3 = new float *[Dim];
 
   for (i = 0; i < Dim; i++)
-    M3[i] = new float[Dim];
+    M3[i] = new float[Dim]();
+
+  if (!M1 || !M2) {
+    return M3;
+  }
 
   for (i = 0; i < Dim; i++) {
     for (ii = 0; ii < Dim; ii++) {
       sum = 0;
       for (j = 0; j < Dim; j++) {
-        sum += M1[i][j] * M2[j][ii];
+        float lhs = M1[i] ? M1[i][j] : 0.0f;
+        float rhs = M2[j] ? M2[j][ii] : 0.0f;
+        sum += lhs * rhs;
       }
       M3[i][ii] = sum;
     }
@@ -309,6 +321,9 @@ float *M_b::mult_esc(float e, float *v) {
 float M_b::mult_v(float *v1, float *v2) {
   int i;
   float sum = 0.0;
+  if (!v1 || !v2) {
+    return sum;
+  }
   for (i = 0; i < Dim; i++) {
     sum += v1[i] * v2[i];
   }
@@ -320,6 +335,14 @@ float *M_b::sum_v(float *v1, float *v2) {
   float *v3;
 
   v3 = new float[Dim];
+  if (!v1 || !v2) {
+    for (i = 0; i < Dim; i++) {
+      float lhs = v1 ? v1[i] : 0.0f;
+      float rhs = v2 ? v2[i] : 0.0f;
+      v3[i] = lhs + rhs;
+    }
+    return v3;
+  }
   for (i = 0; i < Dim; i++)
     v3[i] = v1[i] + v2[i];
   return v3;
@@ -330,6 +353,14 @@ float *M_b::dif_v(float *v2, float *v1) {
   float *v3;
 
   v3 = new float[Dim];
+  if (!v2 || !v1) {
+    for (i = 0; i < Dim; i++) {
+      float lhs = v2 ? v2[i] : 0.0f;
+      float rhs = v1 ? v1[i] : 0.0f;
+      v3[i] = lhs - rhs;
+    }
+    return v3;
+  }
   for (i = 0; i < Dim; i++)
     v3[i] = v2[i] - v1[i];
   return v3;
@@ -341,9 +372,15 @@ float *M_b::norma_v(float *v) {
   float nrm = 0.0;
   float *v3;
 
-  v3 = new float[Dim];
+  v3 = new float[Dim]();
+  if (!v) {
+    return v3;
+  }
   for (i = 0; i < Dim; i++)
     nrm += pow(v[i], 2);
+  if (nrm == 0.0f) {
+    return v3;
+  }
   nrm = sqrt(nrm);
   for (i = 0; i < Dim; i++)
     v3[i] = v[i] / nrm;
