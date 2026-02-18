@@ -2,14 +2,7 @@ extern "C" {
 #include <stdlib.h>
 }
 #include "espai.h"
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunknown-warning-option"
-#endif
 #include <Rcpp.h>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 //' @title pcop_backend
 //' @name pcop_backend

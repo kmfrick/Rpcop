@@ -402,7 +402,15 @@ float espai::calcular_corba_en_un_sentit() {
 
   xo.act = NULL;
   naux_delta = 1;
-  while (no_creua_corba(xo.ant)) {
+  // Cap at n_punts: a principal curve cannot meaningfully have more oriented
+  // points than the dataset has points. Without this bound, near-zero delta
+  // values (which can arise from extreme scale anisotropy causing alfa -> 1 in
+  // the bandwidth formula) would cause the loop to run for an unbounded number
+  // of steps before the natural termination conditions fire.
+  int max_steps = ll_pt->n_punts();
+  int n_steps = 0;
+  while (no_creua_corba(xo.ant) && n_steps < max_steps) {
+    n_steps++;
     /* search for pop */
     bficorba = TRUE; // remains true until no further point can be processed.
     delete[] v_xact2xm;
@@ -523,6 +531,9 @@ float espai::calcular_corba_en_sentit_contrari() {
   float *v_xact2xm = NULL;
   float *v_xant2xm = NULL;
   int naux_delta;
+  // Same cap as in the forward direction; see comment there.
+  int max_steps = ll_pt->n_punts();
+  int n_steps = 0;
   float sum = 0;
 
   ll_pt->tornar_a_xomig();
@@ -557,8 +568,10 @@ float espai::calcular_corba_en_sentit_contrari() {
   // the last one from the opposite-direction curve.
   delete[] n_bo;
   naux_delta = 1;
+  n_steps = 0;
 
-  while (no_creua_corba(xo.ant)) {
+  while (no_creua_corba(xo.ant) && n_steps < max_steps) {
+    n_steps++;
     /* search for pop */
     bficorba = TRUE; // remains true until no further point can be processed.
     delete[] v_xact2xm;
