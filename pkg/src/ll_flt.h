@@ -35,8 +35,8 @@ public:
   node *resetpt() { return Topleft; }
 
   node *noend(node *pt) {
-    return pt->seg; // a l'ultim sera NULL perque creem amb calloc.
-                    // si pt->seg == NULL el camp info de pt estara buit
+    return pt->seg; // the final sentinel has seg == NULL
+                    // and does not carry a valid info value
   }
 
   float llpt(node *pt) { return pt->info; }

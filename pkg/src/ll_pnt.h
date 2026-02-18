@@ -50,9 +50,8 @@ public:
     if (!pt || !pt->seg) {
       return nullptr;
     }
-    return (pt->seg->seg); // a l'ultim elem. contindr info, s'haur
-                           // de tractar apart.
-    // si pt->seg == NULL el camp info de pt estara buit
+    return (pt->seg->seg); // the last node may still hold payload data and must
+                           // be handled separately by the caller
   }
 
   T *llpt(node *pt) { return (pt->info); }

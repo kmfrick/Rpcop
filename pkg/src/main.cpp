@@ -30,19 +30,19 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
   ll_p *ll_pt;
   float *mx;
 
-  // inicializacin valores por defecto, despues en el fichero de setup puede
-  // que cambien modificado 16/4/2002
-  // PROFREQ =1;
+  // Default initialization values (may be overridden in setup).
+  // Modified 2002-04-16.
+  // PROFREQ = 1;
   // NPARTs = 4;
   // C_h = 0.75;
-  // C_d = 0.4;		// siempre menor que 0.5
+  // C_d = 0.4; // always < 0.5
 
   int Dim = x.ncol();
   ll_pt = new ll_p(Dim);
   for (i = 0; i < x.nrow(); i++) {
     float *d_punt = new float[Dim + 1];
     d_punt[0] = 1;
-    d_punt++; // coordenada -1 pel pes.
+    d_punt++; // coordinate -1 holds the weight.
     for (int j = 0; j < x.ncol(); j++) {
       d_punt[j] = x(i, j);
     }
@@ -67,9 +67,8 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
     Rcpp::stop("Could not allocate mx.\n");
   }
   psp = new espai(ll_pt, Dim, 0);
-  // modificacion 16/4/2002
+  // Modified 2002-04-16.
   psp->inicializar_nparts_ch_cd(profreq, nparts, c_h, c_d);
-  // fin
   psp->rebre_M_a(new M_a(Dim, 0, Ma, mx));
   static_cast<void>(
       psp->obtenir_VTG(&mx)); // static_cast to ignore return value

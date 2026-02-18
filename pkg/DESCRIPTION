@@ -1,8 +1,8 @@
 Package: Rpcop
 Type: Package
 Title: Principal Curves of Oriented Points
-Version: 1.1.1
-Date: 2025-10-11
+Version: 1.2.1
+Date: 2026-02-17
 Authors@R:
     c(person(given = "Pedro",
              family = "Delicado",

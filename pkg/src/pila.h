@@ -9,11 +9,11 @@ private:
   node *n_top;
 
 public:
-  //  constructora
+  // constructor
   pila();
   void apilar(void *pt);
   void *desapilar();
 
-  // consultora
+  // query method
   int pila_buida();
 };

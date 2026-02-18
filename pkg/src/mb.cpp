@@ -12,7 +12,7 @@ M_b::M_b(int d, float *b) {
   float *v_dif, *v_acum1, *v_acum2, *mesc;
 
   Dim = d;
-  /* creamos e inicializamos Mb y MId */
+  /* we create and initialize Mb and MId */
   Mb = new float *[Dim];
   MId = new float *[Dim];
   MInv = NULL;
@@ -26,7 +26,7 @@ M_b::M_b(int d, float *b) {
     MId[i][i] = 1;
   }
 
-  /* insertamos b_act en matriz identidad */
+  /* we insert b_act into identity matrix */
 
   i = 0;
   while (!b[i])
@@ -38,9 +38,9 @@ M_b::M_b(int d, float *b) {
       Mb[j + 1] = Mb[j];
   }
 
-  Mb[0] = b; // reusamos el vector b pasado por parametro.
+  Mb[0] = b; // we reuse the vector b passed by parameter.
 
-  /* proceso de ortonormalizacin de Gram-Schmidt */
+  /* Gram-Schmidt orthonormalization process */
 
   v_acum1 = new float[Dim]();
   Mb[0] = norma_v(Mb[0]);
@@ -64,7 +64,7 @@ M_b::M_b(int d, float **n_M, float *n_xo) {
   Mb = n_M;
   xo = n_xo;
 
-  /* creamos e inicializamos  MId */
+  /* we create and initialize MId */
   MId = new float *[Dim];
   MInv = NULL;
 
@@ -95,16 +95,15 @@ M_b::~M_b() {
   delete[] MInv;
   delete[] MId;
 
-  // delete xo xo  es gestiona desde espai (calcular_corba_en_sentit(),
-  // calcular_corba_en_sentit_contrari()).
+  // xo ownership is managed by espai (curve-direction routines).
 }
 
 M_b *M_b::girar(int eix, float angle) {
-  // 0 < eix < Dim                    giro bo i  eix en sentit positiu
+  // 0 < axis < Dim: rotate b with respect to this axis in positive direction.
 
   float **Mbaux;
 
-  // insertamos el giro en la matriz identidad
+  // insert the rotation into the identity matrix
   MId[0][0] = cos(angle);
   MId[0][eix] = sin(angle);
   MId[eix][eix] = cos(angle);
@@ -112,7 +111,7 @@ M_b *M_b::girar(int eix, float angle) {
 
   Mbaux = MxM(Mb, MId);
 
-  // corregimos la matriz identidad
+  // restore the identity matrix
   MId[0][0] = 1;
   MId[0][eix] = 0;
   MId[eix][eix] = 1;
@@ -139,8 +138,8 @@ M_b *M_b::replicar() {
 void M_b::calcular_la_inversa() {
   int i;
   float **c_Mb;
-  // calculamos la inversa  realizados los giros de Mb y antes de aplicarla
-  // sobre puntos. Si el Mb resulta optimo se calculara mas de 1 vez
+  // compute inverse after Mb rotations and before applying Mb to points.
+  // If Mb is optimal, this may be recomputed more than once.
 
   if (MInv) {
     for (i = 0; i < Dim; i++)
@@ -148,7 +147,7 @@ void M_b::calcular_la_inversa() {
     delete[] MInv;
   }
 
-  /* copiar la Mb  */ // ya que sera modificada por inv()
+  /* copy Mb */ // inv() modifies its input
 
   c_Mb = new float *[Dim];
   for (i = 0; i < Dim; i++)
@@ -158,60 +157,60 @@ void M_b::calcular_la_inversa() {
     memmove(c_Mb[i], Mb[i], Dim * sizeof(float));
   // for (j=0;j<Dim;j++) c_Mb[i][j] = Mb[i][j];
 
-  /* calcular inversa */
+  /* calculate inverse */
 
   MInv = inv(c_Mb);
 
-  /* borrar c_Mb  */
+  /* delete c_Mb */
   for (i = 0; i < Dim; i++)
     delete[] c_Mb[i];
   delete[] c_Mb;
 }
 
 float *M_b::aplicar(
-    float *punt) { /* aplica Mb al punt y dona el punt per l'espai inferior */
+    float *punt) { /* apply Mb and return coordinates in the lower-dimensional subspace */
   float *p2;
   float *p3;
   p2 = dif_v(punt, xo);
-  p3 = Mxv(MInv, p2); /* se pasa la inversa */
+  p3 = Mxv(MInv, p2); /* apply inverse */
 
-  // la primera coordenada sera la distancia al pla, les seguents, les del punt
-  // al pla inferior.
+  // First coordinate is signed offset from the plane; remaining coordinates are
+  // projected point coordinates in the lower plane.
 
   delete[] p2;
   return p3;
 }
 
-float *M_b::desaplicar(float *punt) { /* operacin inversa a aplicar */
+float *M_b::desaplicar(float *punt) { /* inverse operation of apply */
   float *p2;
   float *p3;
 
   p2 = Mxv(Mb, punt);
   p3 = sum_v(p2, xo);
 
-  // la primera coordenada sera la distancia al pla, les seguents, les del punt
-  // al pla inferior.
+  // First coordinate is signed offset from the plane; remaining coordinates are
+  // projected point coordinates in the lower plane.
 
   delete[] p2;
   return p3;
 }
 
 void M_b::rebre_xo(float *punt) {
-  // se ejecutara una vez por avance_cluster() y todas las veces que el pop
-  // candidato cruce el hiperplano del pop anterior.
-  // free xo;    //  no fa falta alliverar l'espai. O b ha estat eliminat al
-  // crear el nou xo, o es un xo compartir amb la matriu del pop anterior.
+  // It will be executed once for advancement_cluster() and every time the pop
+  // candidate crosses the previous pop hyperplane.
+  // free xo; // no need to free here. Either b is deleted when creating the new
+  // xo, or xo is shared with the previous pop matrix.
   xo = punt;
 }
 
-/* Ma es la matriu que l'espai inferior  necesacitar per pasar*/
-/* els seus punts i vectors finals a les coordenades originals    */
+/* Ma is the matrix lower-dimensional subspaces need to map points/vectors */
+/* back to original coordinates */
 
 M_a *M_b::donar_M_a(M_a *Ma) {
-  // se ejecutara como mximo una vez si resulta ser el M_b optimo.
+  // Executed at most once if this is the optimal M_b.
 
   return Ma->donar_M_a(
-      Mb, xo); // xo, en aquest punt haur de ser de tamany Dim+prof.
+      Mb, xo); // xo must have size Dim+prof at this point.
 }
 
 float *M_b::donar_bopt() { return Mb[0]; }
@@ -238,18 +237,7 @@ float **M_b::inv(float **M) {
     }
   }
 
-  /*  for (i=0;i<Dim;i++){
-      j=(i+1)%Dim;
-      aux = j;            // si no se vuelca la  j, el % no funciona
-     correctamente borlan c++ !!??? while (j!=i){ Mji = M[j][i];
-      for(ii=0;ii<Dim;ii++){
-      Inv[j][ii]= (Inv[j][ii]*M[i][i])-(Inv[i][ii]*Mji);   // no pot modificarse
-     M avans de Inv M[j][ii]= (M[j][ii]*M[i][i])-(M[i][ii]*Mji);
-      }
-      j=(j+1)%Dim;
-      }
-      }
-   */
+  /* Legacy alternative implementation was kept here historically; removed for clarity. */
   for (j = 0; j < Dim; j++) {
     for (ii = 0; ii < Dim; ii++)
       Inv[j][ii] = Inv[j][ii] / M[j][j];
@@ -258,7 +246,7 @@ float **M_b::inv(float **M) {
 }
 
 float *M_b::Mxv(float **M1, float *v) {
-  // vxM, trabajamos con vectores fila.
+  // vxM, we work with row vectors.
   int i, j;
   float sum;
   float *v3 = new float[Dim]();
@@ -280,7 +268,7 @@ float *M_b::Mxv(float **M1, float *v) {
 }
 
 float **M_b::MxM(float **M1, float **M2) {
-  // vxM, trabajos con vectores fila.
+  // vxM, works with row vectors.
   int i, ii, j;
   float sum;
   float **M3;
@@ -367,7 +355,7 @@ float *M_b::dif_v(float *v2, float *v1) {
 }
 
 float *M_b::norma_v(float *v) {
-  // devuelve el vector normalizado
+  // returns the normalized vector
   int i;
   float nrm = 0.0;
   float *v3;
