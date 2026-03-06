@@ -247,7 +247,7 @@ void espai::calcular_Mb(int ejegir, M_b *Mb, float porcion_pinza) {
         optims.VTG = VTG;
         optims.Mb = Mb;
         optims.espai_ = espai;
-        delete optims.mds.xmean;
+        delete[] optims.mds.xmean;
         optims.mds.xmean = Mb->desaplicar(mds.xmean); // recover candidate pop
         optims.mds.span = mds.span;
         optims.mds.density = mds.density;
@@ -452,7 +452,7 @@ float espai::calcular_corba_en_un_sentit() {
                // (cosine theorem). We must avoid this.
       /* Advance original xo slightly more than at initial advance. */
       naux_delta++;
-      delete optims.mds.xmean;
+      delete[] optims.mds.xmean;
       n_bo = mult_esc(naux_delta * delta, optims.Mb_ant->donar_bopt());
       optims.mds.xmean =
           sum_v(xo.ant, n_bo); // increase step when candidate would switch to opposite direction.
@@ -612,7 +612,7 @@ float espai::calcular_corba_en_sentit_contrari() {
             0) { // If angle < 0, we are changing curve direction. Avoid this.
       /* Advance original xo a bit more than in the previous iteration. */
       naux_delta++;
-      delete optims.mds.xmean;
+      delete[] optims.mds.xmean;
       n_bo = mult_esc(naux_delta * delta, optims.Mb_ant->donar_bopt());
       optims.mds.xmean = sum_v(xo.ant, n_bo);
       delete[] n_bo;
