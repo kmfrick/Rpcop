@@ -42,6 +42,7 @@ ll_p::ll_p(int d) {
     min[i] = INF;
   x_mean = new float[Dim + 1](); // for depth-0 spaces this accumulates xmean;
                                  // otherwise it is the local origin passed down.
+  owns_x_mean = true;
 }
 
 ll_p::~ll_p() {
@@ -80,7 +81,11 @@ ll_p::~ll_p() {
       delete auxpt;
     }
 
-  // `max` and `min` are freed by the receiving space.
+  delete[] max;
+  delete[] min;
+  if (owns_x_mean) {
+    delete[] x_mean;
+  }
 }
 
 void ll_p::add_ordX_principal(float *vect) {
@@ -155,6 +160,10 @@ void ll_p::donar_max_min_xomig(float **mx, float **mn, float **xm, float *s_d) {
   *mn = min;
   *xm = x_mean; // weighted xmean (or final-space representative origin).
   *s_d = suma_d;
+  max = NULL;
+  min = NULL;
+  x_mean = NULL;
+  owns_x_mean = false;
 }
 
 void ll_p::calcular_max_min_cluster() {
@@ -451,6 +460,7 @@ float *ll_p::obtener_satelites() {
 
   if (xoant && xoant->coord) {
     delete[] x_mean; // replace theoretical xmean with practical xorig
+    owns_x_mean = false;
     return xoant->coord;
   }
   return x_mean;

@@ -53,6 +53,7 @@ private:
   float *min;
   float *max;
   float *x_mean; // to compute xmid
+  bool owns_x_mean;
 
   // modifiers
 

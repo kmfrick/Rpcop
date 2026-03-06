@@ -12,13 +12,66 @@ espai::espai(ll_p *ll_punts, int d, int p) {
   ll_pt = ll_punts;
   Dim = d;
   profundidad = p;
+  suma_d = 0.0f;
+  h_tail = 0.0f;
+  delta = 0.0f;
+  eps_x = NULL;
+  xomig = NULL;
+  xomig_offset = 0;
+  xomig_shared = false;
+  bficorba = FALSE;
+  optims.VTG = 0.0f;
+  optims.Mb = NULL;
+  optims.Mb_ant = NULL;
+  optims.espai_ = NULL;
+  optims.mds.xmean = NULL;
+  optims.mds.span = 0.0f;
+  optims.mds.density = 0.0f;
+  xo.act = NULL;
+  xo.ant = NULL;
+  Var_PC = 0.0f;
+  Var_res = 0.0f;
+  GTV = 0.0f;
   Ma = NULL;
   ll_pop = NULL;
 }
 
+espai::pop::~pop() {
+  delete[] (alpha ? alpha - depth : NULL);
+  delete[] (b_ast ? b_ast - depth : NULL);
+  delete espai_;
+}
+
 espai::~espai() {
 
+  delete ll_pt;
+  ll_pt = NULL;
+
   delete Ma;
+  Ma = NULL;
+
+  delete[] eps_x;
+  eps_x = NULL;
+
+  if (!xomig_shared && xomig) {
+    delete[] (xomig - xomig_offset);
+  }
+  xomig = NULL;
+  xomig_offset = 0;
+  xomig_shared = false;
+
+  delete optims.Mb;
+  optims.Mb = NULL;
+  delete optims.Mb_ant;
+  optims.Mb_ant = NULL;
+  delete optims.espai_;
+  optims.espai_ = NULL;
+  delete[] optims.mds.xmean;
+  optims.mds.xmean = NULL;
+  delete[] xo.act;
+  xo.act = NULL;
+  delete[] xo.ant;
+  xo.ant = NULL;
 
   // Ownership/lifetime notes:
   // ll_pt, xomig, eps_x, mds.xmean, and optims.mds.xmean are typically
@@ -32,6 +85,7 @@ espai::~espai() {
   /* delete output lists */
 
   delete ll_pop;
+  ll_pop = NULL;
 }
 
 float espai::obtenir_VTG(float **xm) {
@@ -64,21 +118,21 @@ float espai::obtenir_VTG(float **xm) {
 
     GTV = finalitzacio(); /* obtain curve GTV */
   }
-  float *stable_xomig = NULL;
-  if (xomig) {
-    stable_xomig = new float[Dim + 1]();
-    stable_xomig++;
-    memmove(stable_xomig, xomig, Dim * sizeof(float));
-  }
-
   delete ll_pt; // once GTV is obtained, ll_pt is no longer needed.
-  if (stable_xomig) {
-    xomig = stable_xomig;
-  }
-  // delete[] xomig; this point is passed to the upper space and freed there.
+  ll_pt = NULL;
   delete[] eps_x;
-  *xm = xomig ? xomig - 1
-              : NULL; // xmean passed by ll_p (or the curve midpoint pop).
+  eps_x = NULL;
+  if (!xomig) {
+    *xm = NULL;
+  } else {
+    float *returned_xomig = new float[Dim + 1]();
+    if (xomig_offset == 0) {
+      memmove(returned_xomig + 1, xomig, Dim * sizeof(float));
+    } else {
+      memmove(returned_xomig, xomig - 1, (Dim + 1) * sizeof(float));
+    }
+    *xm = returned_xomig;
+  }
   return GTV;
 }
 
@@ -131,6 +185,8 @@ espai *espai::obtenir_cluster(M_b *Mb, m_d_s *mds) {
 
       n_pnt = treure_coord(n_pnt);
       n_ll_pt->add_ordX_principal(n_pnt);
+    } else {
+      delete[] n_pnt;
     }
     v_pnt = ll_pt->seguent_candidat_clt(validacio);
   }
@@ -147,6 +203,8 @@ espai *espai::obtenir_cluster(M_b *Mb, m_d_s *mds) {
         /* insert new point to cluster */
         n_pnt = treure_coord(n_pnt);
         n_ll_pt->add_ordX_principal(n_pnt);
+      } else {
+        delete[] n_pnt;
       }
       v_pnt = ll_pt->seguent_candidat_clt(
           validacio); // termination is controlled by candidate traversal state.
@@ -188,8 +246,11 @@ int espai::fi_corba(float *v_pnt) {
     if (Mba_pnt[X] > 2 * delta)
       bficorba = FALSE; // uses 2*delta threshold instead of h_tail.
     //if (Mba_pnt[X]>h_tail) bficorba = FALSE;
-    else
+    else {
+      delete[] Mba_pnt;
       return TRUE;
+    }
+    delete[] Mba_pnt;
   }
   return FALSE;
 }
@@ -205,8 +266,11 @@ int espai::no_creua_corba(float *ncand) {
         delta) { // if the curve is a circle, the last point is at distance delta
                  // from xomig.
       punt = optims.Mb_ant->aplicar(((pop *)ll_pop->llpt(pt))->alpha);
-      if (punt[X] > 0)
+      if (punt[X] > 0) {
+        delete[] punt;
         return FALSE;
+      }
+      delete[] punt;
     }
     ll_pop->advpt(&pt);
   }
@@ -257,8 +321,9 @@ void espai::calcular_Mb(int ejegir, M_b *Mb, float porcion_pinza) {
         delete espai;
       }
     } // Even if this cluster has no more points, other clusters may still.
-    else
+    else {
       delete Mb;
+    }
     delete[] mds.xmean;
   }
 }
@@ -363,6 +428,8 @@ float espai::calcular_corba_en_un_sentit() {
   optims.mds.xmean =
       allargar(optims.mds.xmean); // extend optimal xmean for storage in outputs.
   xomig = optims.mds.xmean;       // new midpoint pop of the curve; do not lose it.
+  xomig_offset = profundidad;
+  xomig_shared = true;
 
   optims.Mb->rebre_xo(optims.mds.xmean); // pass extended xo to optimal Mb;
                                          // Ma is computed from it.
@@ -370,6 +437,7 @@ float espai::calcular_corba_en_un_sentit() {
   // Pass Ma positioned in original coordinates for this Mb plane.
 
   n_pop = new pop;
+  n_pop->depth = profundidad;
   sum = 0;
   n_pop->I = 0;
   delete[] xo.ant; // discard xo of previous Mb_ant.
@@ -386,7 +454,13 @@ float espai::calcular_corba_en_un_sentit() {
   n_pop->var_k = optims.VTG;
   n_pop->span = optims.mds.span;
   n_pop->density = optims.mds.density;
-  n_pop->espai_ = optims.espai_;
+  if (PROF_REQ == 2) {
+    n_pop->espai_ = optims.espai_;
+  } else {
+    delete optims.espai_;
+    n_pop->espai_ = NULL;
+  }
+  optims.espai_ = NULL;
 
   ll_pop->add(n_pop);
   /* update cluster */
@@ -434,9 +508,17 @@ float espai::calcular_corba_en_un_sentit() {
                   pinza / NPARTS); // evaluate one subdivision of the angle window
       if (optims.VTG == INF) { // all hyperplanes were already processed in
                                // previous clusters; no points remain.
+        delete optims.Mb;
+        optims.Mb = NULL;
         delete optims.Mb_ant;
+        optims.Mb_ant = NULL;
+        delete[] xo.act;
+        xo.act = NULL;
+        delete[] optims.mds.xmean;
+        optims.mds.xmean = NULL;
         // xo.act is freed in the opposite-direction routine.
         delete[] xo.ant;
+        xo.ant = NULL;
         return (sum); // exit when there are no more points to process
       }
       pinza = pinza / NPARTS; // shrink to one subdivision of previous window
@@ -466,6 +548,7 @@ float espai::calcular_corba_en_un_sentit() {
                                // hold due to naux_delta; remove v_xant2xm.
       /* Values are invalid: search for another cluster starting from xmean. */
       delete optims.espai_;
+      optims.espai_ = NULL;
     } else {
       /* Values are valid. */
       /* update lists */
@@ -480,6 +563,7 @@ float espai::calcular_corba_en_un_sentit() {
       // Pass Ma positioned in original coordinates for this Mb plane.
 
       n_pop = new pop;
+      n_pop->depth = profundidad;
       sum += distancia(xo.act, xo.ant);
       n_pop->I = sum;
       delete[] xo.ant;
@@ -496,7 +580,13 @@ float espai::calcular_corba_en_un_sentit() {
       n_pop->var_k = optims.VTG;
       n_pop->span = optims.mds.span;
       n_pop->density = optims.mds.density;
-      n_pop->espai_ = optims.espai_;
+      if (PROF_REQ == 2) {
+        n_pop->espai_ = optims.espai_;
+      } else {
+        delete optims.espai_;
+        n_pop->espai_ = NULL;
+      }
+      optims.espai_ = NULL;
 
       ll_pop->add(n_pop);
 
@@ -515,9 +605,15 @@ float espai::calcular_corba_en_un_sentit() {
       naux_delta = 1;
     }
   }
+  delete optims.Mb;
+  optims.Mb = NULL;
   delete optims.Mb_ant;
+  optims.Mb_ant = NULL;
+  delete[] optims.mds.xmean;
+  optims.mds.xmean = NULL;
   // xo.act is deleted in the opposite-direction routine.
   delete[] xo.ant;
+  xo.ant = NULL;
   return (sum); // exit when there is a crossing with the curve itself
 }
 
@@ -537,6 +633,13 @@ float espai::calcular_corba_en_sentit_contrari() {
   float sum = 0;
 
   ll_pt->tornar_a_xomig();
+
+  delete optims.Mb;
+  optims.Mb = NULL;
+  delete[] optims.mds.xmean;
+  optims.mds.xmean = NULL;
+  delete[] xo.act;
+  xo.act = NULL;
 
   auto pt = ll_pop ? ll_pop->resetpt() : nullptr;
   if (!pt || !ll_pop->llpt(pt) || !((pop *)ll_pop->llpt(pt))->b_ast) {
@@ -597,9 +700,16 @@ float espai::calcular_corba_en_sentit_contrari() {
                                // were already processed in previous clusters;
                                // we must continue in opposite direction, else
                                // we would exit at the first window
+        delete optims.Mb;
+        optims.Mb = NULL;
         delete optims.Mb_ant;
+        optims.Mb_ant = NULL;
         delete[] xo.act;
+        xo.act = NULL;
+        delete[] optims.mds.xmean;
+        optims.mds.xmean = NULL;
         delete[] xo.ant;
+        xo.ant = NULL;
         return (sum); // exit when there are no more points to process
       }
       pinza = pinza / NPARTS; // shrink to one subdivision of previous window
@@ -625,6 +735,7 @@ float espai::calcular_corba_en_sentit_contrari() {
                                // hold due to naux_delta; remove v_xant2xm.
       /* Values are invalid: search for another cluster starting from xmean. */
       delete optims.espai_;
+      optims.espai_ = NULL;
     } else {
       /* Values are valid. */
       /* update lists */
@@ -647,6 +758,7 @@ float espai::calcular_corba_en_sentit_contrari() {
                                          // for next cluster step.
 
       n_pop = new pop;
+      n_pop->depth = profundidad;
       sum -= distancia(xo.act, xo.ant); // negative distances in opposite direction.
       n_pop->I = sum;
       delete[] xo.ant;
@@ -660,7 +772,13 @@ float espai::calcular_corba_en_sentit_contrari() {
       n_pop->var_k = optims.VTG;
       n_pop->span = optims.mds.span;
       n_pop->density = optims.mds.density;
-      n_pop->espai_ = optims.espai_;
+      if (PROF_REQ == 2) {
+        n_pop->espai_ = optims.espai_;
+      } else {
+        delete optims.espai_;
+        n_pop->espai_ = NULL;
+      }
+      optims.espai_ = NULL;
 
       ll_pop->addrev(n_pop);
 
@@ -678,9 +796,16 @@ float espai::calcular_corba_en_sentit_contrari() {
       naux_delta = 1;
     }
   }
+  delete optims.Mb;
+  optims.Mb = NULL;
   delete optims.Mb_ant;
+  optims.Mb_ant = NULL;
+  delete[] optims.mds.xmean;
+  optims.mds.xmean = NULL;
   delete[] xo.act;
+  xo.act = NULL;
   delete[] xo.ant;
+  xo.ant = NULL;
   return (sum); // exit when there is a crossing with the curve itself
 }
 
@@ -827,6 +952,8 @@ float espai::obtenir_STV() {
   memmove(c_xomig, xomig, Dim * sizeof(float));
   delete[] xomig;
   xomig = c_xomig;
+  xomig_offset = 1;
+  xomig_shared = false;
 
   auto pt = ll_pt->resetpt();
   while (ll_pt->noend(pt)) {
@@ -845,6 +972,8 @@ void espai::calcular_htail_delta_xomig_epsx() {
   float *range, *min, *max;
 
   ll_pt->donar_max_min_xomig(&max, &min, &xomig, &suma_d);
+  xomig_offset = 0;
+  xomig_shared = false;
 
   range = dif_v(max, min);
   eps_x = mult_esc(C_EPS, range);
@@ -868,7 +997,6 @@ float espai::finalitzacio() {
 
   ll_flt w_s;
   float *xomig_0 = NULL, *xomig_1 = NULL;
-  float *c_xomig;
   float Iant, I2ant, dant, wsact;
   float sum = 0;
   pop *p0;
@@ -884,11 +1012,9 @@ float espai::finalitzacio() {
 
   // Degenerate curve with a single POP: keep a valid xomig and GTV.
   if (!ll_pop->noend(pt)) {
-    c_xomig = new float[(Dim + 1)];
-    c_xomig[0] = 0;
-    c_xomig++;
-    memmove(c_xomig, p0->alpha, Dim * sizeof(float));
-    xomig = c_xomig;
+    xomig = p0->alpha;
+    xomig_offset = profundidad;
+    xomig_shared = true;
     p0->I = 0.0;
     p0->density = 1.0;
     Var_PC = 0.0;
@@ -972,24 +1098,27 @@ float espai::finalitzacio() {
   }
   /* assign curve-center pop to pass to the upper space */
 
-  // Do not delete xomig here: it is reassigned from ll_pop data below.
-  xomig = new float[(Dim + 1)];
-  xomig[0] = 0;
-  xomig++;
   if (!((pop *)ll_pop->llpt(pt))->I) {
-    xomig = mult_esc(((pop *)ll_pop->llpt(pt))->I,
-                     ((pop *)ll_pop->llpt(ptant))->alpha);
+    float *center = mult_esc(((pop *)ll_pop->llpt(pt))->I,
+                             ((pop *)ll_pop->llpt(ptant))->alpha);
     xomig_0 = mult_esc(((pop *)ll_pop->llpt(ptant))->I,
                        ((pop *)ll_pop->llpt(pt))->alpha);
-    xomig_1 = sum_v(xomig, xomig_0);
+    xomig_1 = sum_v(center, xomig_0);
     delete[] xomig_0;
-    delete[] xomig;
-    xomig =
+    delete[] center;
+    center =
         mult_esc(((pop *)ll_pop->llpt(pt))->I * ((pop *)ll_pop->llpt(ptant))->I,
-                 xomig_1); // xomig transferred to the upper space.
+                 xomig_1);
+    xomig = allargar(center);
+    xomig_offset = profundidad;
+    xomig_shared = false;
     delete[] xomig_1;
-  } else
-    memmove(xomig, ((pop *)ll_pop->llpt(pt))->alpha, Dim * sizeof(float));
+    delete[] center;
+  } else {
+    xomig = ((pop *)ll_pop->llpt(pt))->alpha;
+    xomig_offset = profundidad;
+    xomig_shared = true;
+  }
 
   ll_pop->advpt(&pt);
   w_s.advpt(&ptws);

@@ -34,6 +34,8 @@ private:
   float *eps_x; // minimum distance required between cluster xo and xmean
                 // for validity; shared by all clusters in the current space.
   float *xomig; // required for obtain_STV() and to obtain initial xo and b_opt.
+  int xomig_offset; // leading coordinates owned before xomig; 0 means raw local coords.
+  bool xomig_shared; // true when xomig aliases memory still owned elsewhere.
   // When computing the curve in the opposite direction, we do not necessarily
   // start from this xomig; we can start from its corresponding pop.
 
@@ -59,6 +61,7 @@ private:
   } xo;
 
   struct pop {
+    int depth;
     float *alpha;
     float I;
     float *b_ast;
@@ -66,6 +69,8 @@ private:
     float span;
     float density;
     espai *espai_;
+
+    ~pop();
   };
 
   float Var_PC;

@@ -11,6 +11,7 @@ private:
 public:
   // constructor
   pila();
+  ~pila();
   void apilar(void *pt);
   void *desapilar();
 

@@ -9,53 +9,65 @@ extern "C" {
 M_b::M_b(int d, float *b) {
   int i;
   int j;
+  int pivot;
   float *v_dif, *v_acum1, *v_acum2, *mesc;
 
   Dim = d;
+  xo = NULL;
   /* we create and initialize Mb and MId */
   Mb = new float *[Dim];
   MId = new float *[Dim];
   MInv = NULL;
 
-  for (i = 0; i < Dim; i++) {
+  Mb[0] = b; // this constructor takes ownership of the input vector.
+  pivot = 0;
+  while (pivot < Dim && !b[pivot]) {
+    pivot++;
+  }
+  if (pivot == Dim) {
+    pivot = 0;
+  }
+
+  for (i = 1, j = 0; i < Dim; i++, j++) {
+    if (j == pivot) {
+      j++;
+    }
     Mb[i] = new float[Dim]();
+    if (j < Dim) {
+      Mb[i][j] = 1;
+    }
+  }
+
+  for (i = 0; i < Dim; i++) {
     MId[i] = new float[Dim]();
   }
   for (i = 0; i < Dim; i++) {
-    Mb[i][i] = 1;
     MId[i][i] = 1;
   }
-
-  /* we insert b_act into identity matrix */
-
-  i = 0;
-  while (!b[i])
-    i++;
-  if (i) {
-    for (j = i - 1; j; j--)
-      Mb[j + 1] = Mb[j];
-    for (j = Dim - 2; j > i + 1; j--)
-      Mb[j + 1] = Mb[j];
-  }
-
-  Mb[0] = b; // we reuse the vector b passed by parameter.
 
   /* Gram-Schmidt orthonormalization process */
 
   v_acum1 = new float[Dim]();
-  Mb[0] = norma_v(Mb[0]);
+  v_dif = norma_v(Mb[0]);
+  delete[] Mb[0];
+  Mb[0] = v_dif;
   for (i = 1; i < Dim; i++) {
     delete[] v_acum1;
     v_acum1 = new float[Dim]();
     for (j = 0; j < i; j++) {
       mesc = mult_esc(mult_v(Mb[i], Mb[j]), Mb[j]);
       v_acum2 = sum_v(v_acum1, mesc);
+      delete[] mesc;
       delete[] v_acum1;
       v_acum1 = v_acum2;
     }
     v_dif = dif_v(Mb[i], v_acum1);
-    Mb[i] = norma_v(v_dif);
+    v_acum2 = norma_v(v_dif);
+    delete[] v_dif;
+    delete[] Mb[i];
+    Mb[i] = v_acum2;
   }
+  delete[] v_acum1;
 }
 
 M_b::M_b(int d, float **n_M, float *n_xo) {
@@ -69,7 +81,7 @@ M_b::M_b(int d, float **n_M, float *n_xo) {
   MInv = NULL;
 
   for (i = 0; i < Dim; i++) {
-    MId[i] = new float[Dim];
+    MId[i] = new float[Dim]();
   }
   for (i = 0; i < Dim; i++) {
     MId[i][i] = 1;
@@ -79,20 +91,18 @@ M_b::M_b(int d, float **n_M, float *n_xo) {
 M_b::~M_b() {
   int i;
 
-  if (MInv)
+  for (i = 0; i < Dim; i++) {
+    delete[] Mb[i];
+    delete[] MId[i];
+  }
+  if (MInv) {
     for (i = 0; i < Dim; i++) {
-      delete[] Mb[i];
       delete[] MInv[i];
-      delete[] MId[i];
     }
-  else
-    for (i = 0; i < Dim; i++) {
-      delete[] Mb[i];
-      delete[] MId[i];
-    }
+    delete[] MInv;
+  }
 
   delete[] Mb;
-  delete[] MInv;
   delete[] MId;
 
   // xo ownership is managed by espai (curve-direction routines).
@@ -126,7 +136,7 @@ M_b *M_b::replicar() {
 
   c_Mb = new float *[Dim];
   for (i = 0; i < Dim; i++)
-    c_Mb[i] = new float[Dim * sizeof(float)];
+    c_Mb[i] = new float[Dim];
 
   for (i = 0; i < Dim; i++)
     memmove(c_Mb[i], Mb[i], Dim * sizeof(float));
@@ -151,7 +161,7 @@ void M_b::calcular_la_inversa() {
 
   c_Mb = new float *[Dim];
   for (i = 0; i < Dim; i++)
-    c_Mb[i] = new float[Dim * sizeof(float)];
+    c_Mb[i] = new float[Dim];
 
   for (i = 0; i < Dim; i++)
     memmove(c_Mb[i], Mb[i], Dim * sizeof(float));

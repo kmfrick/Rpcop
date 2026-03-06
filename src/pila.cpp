@@ -6,6 +6,14 @@ extern "C" {
 
 pila::pila() { top = NULL; }
 
+pila::~pila() {
+  while (top) {
+    n_top = top->seg;
+    delete top;
+    top = n_top;
+  }
+}
+
 void pila::apilar(void *pt) {
   n_top = new node;
 
