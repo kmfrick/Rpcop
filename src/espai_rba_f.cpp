@@ -118,10 +118,6 @@ float espai::obtenir_VTG(float **xm) {
 
     GTV = finalitzacio(); /* obtain curve GTV */
   }
-  delete ll_pt; // once GTV is obtained, ll_pt is no longer needed.
-  ll_pt = NULL;
-  delete[] eps_x;
-  eps_x = NULL;
   if (!xomig) {
     *xm = NULL;
   } else {
@@ -133,6 +129,9 @@ float espai::obtenir_VTG(float **xm) {
     }
     *xm = returned_xomig;
   }
+  // Keep ll_pt alive until obtenir_data(); xomig may alias a point it owns.
+  delete[] eps_x;
+  eps_x = NULL;
   return GTV;
 }
 
@@ -970,10 +969,11 @@ float espai::obtenir_STV() {
 
 void espai::calcular_htail_delta_xomig_epsx() {
   float *range, *min, *max;
+  bool owns_xomig;
 
-  ll_pt->donar_max_min_xomig(&max, &min, &xomig, &suma_d);
+  ll_pt->donar_max_min_xomig(&max, &min, &xomig, &suma_d, &owns_xomig);
   xomig_offset = 0;
-  xomig_shared = false;
+  xomig_shared = !owns_xomig;
 
   range = dif_v(max, min);
   eps_x = mult_esc(C_EPS, range);
@@ -1136,7 +1136,8 @@ float espai::finalitzacio() {
   return (Var_PC + Var_res); // GTV
 }
 
-void espai::obtenir_data(float *result, int *ncol, int *nrow) {
+void espai::obtenir_data(float *result, int *ncol, int *nrow,
+                         int max_rows) {
 
   int i;
   *ncol = Dim * 2 + 5;
@@ -1144,6 +1145,11 @@ void espai::obtenir_data(float *result, int *ncol, int *nrow) {
   espai *sespai;
   float *auxa;
   float *auxb;
+  auto ensure_row_capacity = [&]() {
+    if (*nrow >= max_rows) {
+      Rcpp::stop("Internal Rpcop output buffer is too small.\n");
+    }
+  };
   if (ll_pop == NULL) {
     Rcpp::stop("ll_pop is null in espai::obtenir data.\n");
   }
@@ -1156,6 +1162,7 @@ void espai::obtenir_data(float *result, int *ncol, int *nrow) {
     if (result == NULL) {
       Rcpp::stop("result is null in espai::obtenir data.\n");
     }
+    ensure_row_capacity();
     *(result++) = 0;
     *(result++) = 0;
     *(result++) = 1;
@@ -1179,6 +1186,7 @@ void espai::obtenir_data(float *result, int *ncol, int *nrow) {
     if (!cur) {
       return;
     }
+    ensure_row_capacity();
     *(result++) = 0;
     if (result == NULL) {
       Rcpp::stop("result is null in espai::obtenir data.\n");
@@ -1201,6 +1209,7 @@ void espai::obtenir_data(float *result, int *ncol, int *nrow) {
     if (PROF_REQ == 2 && sll_pop) {
       auto pt2 = sll_pop->resetpt();
       while (sll_pop->noend(pt2)) {
+        ensure_row_capacity();
         *(result++) = 1;
         *(result++) = ((pop *)sll_pop->llpt(pt2))->I;
         *(result++) = ((pop *)sll_pop->llpt(pt2))->density;
@@ -1220,6 +1229,7 @@ void espai::obtenir_data(float *result, int *ncol, int *nrow) {
 
         sll_pop->advpt(&pt2);
       }
+      ensure_row_capacity();
       *(result++) = 1;
       *(result++) = ((pop *)sll_pop->llpt(pt2))->I;
       *(result++) = ((pop *)sll_pop->llpt(pt2))->density;
@@ -1244,6 +1254,7 @@ void espai::obtenir_data(float *result, int *ncol, int *nrow) {
   if (!last) {
     return;
   }
+  ensure_row_capacity();
   *(result++) = 0;
   *(result++) = last->I;
   *(result++) = last->density;

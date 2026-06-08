@@ -105,7 +105,8 @@ public:
   float *seguent_candidat_clt(int validacio); // search the next candidate and
                                               // pass the previous validation
   int n_punts();                              // number of points in the cluster
-  void donar_max_min_xomig(float **mx, float **mn, float **xm, float *s_d);
+  void donar_max_min_xomig(float **mx, float **mn, float **xm, float *s_d,
+                           bool *owns_xm);
 
   // pointer-based queries
 

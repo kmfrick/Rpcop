@@ -11,16 +11,15 @@ Principal curves on oriented points are introduced in Delicado and Huerta ([2003
 Use these commands from repository root:
 
 ```bash
-# Run package tests with your default compiler flags while ignoring ~/.R/Makevars
-R_MAKEVARS_USER=/dev/null R_LIBS=/tmp/Rlibs-san \
-  /opt/R-devel-san/bin/Rscript -e "testthat::test_local('pkg')"
+# Build the source tarball, then run a CRAN-style check outside the repo tree
+pkgdir=$PWD
+mkdir -p /private/tmp/rpcop-check
+cd /private/tmp/rpcop-check
+R CMD build --no-manual --no-build-vignettes "$pkgdir"
+R_MAKEVARS_USER=/dev/null R CMD check --as-cran --no-manual --output=/private/tmp/rpcop-check Rpcop_1.2.1.tar.gz
 ```
 
 ```bash
-# Run full sanitizer check with ASan/UBSan instrumentation from tools/sanitize.Makevars
-ASAN_OPTIONS='halt_on_error=1' \
-UBSAN_OPTIONS='print_stacktrace=1:halt_on_error=1' \
-R_MAKEVARS_USER=$PWD/tools/sanitize.Makevars \
-R_LIBS=/tmp/Rlibs-san \
-  /opt/R-devel-san/bin/R CMD check pkg
+# Run Linux ASAN/UBSAN diagnostics
+vagrant up --provision
 ```

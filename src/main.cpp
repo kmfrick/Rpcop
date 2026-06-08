@@ -76,11 +76,13 @@ Rcpp::NumericMatrix pcop_backend(const Rcpp::NumericMatrix &x, float c_d,
   static_cast<void>(
       psp->obtenir_VTG(&returned_xomig)); // static_cast to ignore return value
   int nrow, ncol;
-  std::unique_ptr<float[]> out(new float[(2 * Dim + 5) * x.nrow()]);
+  int max_output_rows = (2 * x.nrow()) + 1;
+  int output_cols = 2 * Dim + 5;
+  std::unique_ptr<float[]> out(new float[output_cols * max_output_rows]);
   if (out == NULL) {
     Rcpp::stop("Could not allocate out.\n");
   }
-  psp->obtenir_data(out.get(), &nrow, &ncol);
+  psp->obtenir_data(out.get(), &nrow, &ncol, max_output_rows);
 
   Rcpp::NumericMatrix proy(nrow, ncol, out.get());
   proy = transpose(proy);

@@ -123,5 +123,5 @@ public:
 
   // Modified 2002-04-16: initialize tuning parameters once at the first space.
   void inicializar_nparts_ch_cd(int profreq, int nparts, float c_h, float c_d);
-  void obtenir_data(float *, int *, int *);
+  void obtenir_data(float *, int *, int *, int);
 };

@@ -1,0 +1,36 @@
+# Compiler flags for AddressSanitizer (ASAN) and UndefinedBehaviorSanitizer (UBSAN)
+# These flags detect memory errors and undefined behavior at runtime
+#
+# Usage:
+#   To enable sanitizers, set USE_SANITIZER=1 before building:
+#     USE_SANITIZER=1 R CMD INSTALL .
+#
+#   Or set in ~/.R/Makevars for persistent use.
+#
+# Note: On macOS, sanitizers have limitations with dynamically loaded libraries.
+#       Linux is recommended for sanitizer testing. The Vagrantfile provides
+#       a Linux environment for this purpose.
+
+# Check if sanitizers are enabled via environment variable
+USE_SANITIZER ?= 0
+
+ifeq ($(USE_SANITIZER),1)
+  # Sanitizer flags for both C and C++
+  SAN_FLAGS = -fsanitize=address,undefined -fno-omit-frame-pointer -fno-optimize-sibling-calls
+
+  # Optimization level (O1 is good for sanitizer use - fast enough but keeps debug info)
+  OPT_FLAGS = -O1 -g
+
+  # Additional useful warnings
+  WARN_FLAGS = -Wall -Wextra -Wno-unused-parameter -Wno-ignored-attributes
+
+  # Apply to R's package build variables
+  PKG_CXXFLAGS = $(OPT_FLAGS) $(WARN_FLAGS) $(SAN_FLAGS)
+  PKG_CFLAGS = $(OPT_FLAGS) $(WARN_FLAGS) $(SAN_FLAGS)
+  PKG_LIBS = $(SAN_FLAGS)
+else
+  # Default build without sanitizers - just use safe optimization
+  PKG_CXXFLAGS = -O2 -Wall -Wextra -Wno-unused-parameter
+  PKG_CFLAGS = -O2 -Wall -Wextra -Wno-unused-parameter
+  PKG_LIBS =
+endif

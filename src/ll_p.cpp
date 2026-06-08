@@ -154,11 +154,13 @@ void ll_p::add_ordX_principal(float *vect) {
   x_mean = x_mean03;
 }
 
-void ll_p::donar_max_min_xomig(float **mx, float **mn, float **xm, float *s_d) {
+void ll_p::donar_max_min_xomig(float **mx, float **mn, float **xm, float *s_d,
+                               bool *owns_xm) {
 
   *mx = max;
   *mn = min;
   *xm = x_mean; // weighted xmean (or final-space representative origin).
+  *owns_xm = owns_x_mean;
   *s_d = suma_d;
   max = NULL;
   min = NULL;

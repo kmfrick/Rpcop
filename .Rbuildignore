@@ -1,0 +1,11 @@
+^\.Rprofile$
+^\.github$
+^\.vagrant$
+^rproject\.toml$
+^rv$
+^rv\.lock$
+^Rpcop\.Rcheck$
+^src/Makevars$
+^tools$
+^Vagrantfile$
+^2026-05-27-22-41-02\.037-VBoxHeadless-20715\.log$
