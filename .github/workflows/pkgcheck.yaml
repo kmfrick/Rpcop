@@ -65,6 +65,23 @@ jobs:
 
           checks <- pkgcheck::pkgcheck(".", use_cache = FALSE)
           website_check_failed <- !isTRUE(checks$checks$repo_has_website)
+          pkgdown_url <- ""
+          if (file.exists("_pkgdown.yml")) {
+            pkgdown_cfg <- readLines("_pkgdown.yml", warn = FALSE)
+            pkgdown_url_line <- grep("^url\\s*:", pkgdown_cfg, value = TRUE)
+            if (length(pkgdown_url_line) > 0L) {
+              pkgdown_url <- trimws(sub("^url\\s*:\\s*", "", pkgdown_url_line[1]))
+              pkgdown_url <- gsub("^[\"']|[\"']$", "", pkgdown_url)
+            }
+          }
+          pkgdown_url_reachable <- FALSE
+          if (nzchar(pkgdown_url)) {
+            pkgdown_url_reachable <- isTRUE(tryCatch({
+              readLines(pkgdown_url, n = 1L, warn = FALSE)
+              TRUE
+            }, error = function(e) FALSE))
+          }
+
           md <- pkgcheck::checks_to_markdown(checks, render = FALSE)
           writeLines(md, "pkgcheck.md")
 
@@ -82,7 +99,8 @@ jobs:
 
           print(summary(checks))
           checks_okay <- isTRUE(attr(md, "checks_okay"))
-          if (!checks_okay && website_check_failed) {
+          ignore_repo_homepage_check <- website_check_failed && pkgdown_url_reachable
+          if (!checks_okay && ignore_repo_homepage_check) {
             checks_ignoring_website <- checks
             checks_ignoring_website$checks$repo_has_website <- TRUE
             checks_okay <- isTRUE(
@@ -95,9 +113,13 @@ jobs:
           if (!checks_okay) {
             quit(status = 1, save = "no")
           }
-          if (website_check_failed) {
+          if (ignore_repo_homepage_check) {
             message(
-              "Ignoring pkgcheck website check; it depends on repository homepage metadata."
+              paste0(
+                "pkgcheck reported missing GitHub homepage metadata, ",
+                "but _pkgdown.yml url is reachable: ",
+                pkgdown_url
+              )
             )
           }
 
