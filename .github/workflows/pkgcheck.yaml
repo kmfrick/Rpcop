@@ -64,6 +64,7 @@ jobs:
           ))
 
           checks <- pkgcheck::pkgcheck(".", use_cache = FALSE)
+          website_check_failed <- !isTRUE(checks$checks$repo_has_website)
           md <- pkgcheck::checks_to_markdown(checks, render = FALSE)
           writeLines(md, "pkgcheck.md")
 
@@ -80,12 +81,21 @@ jobs:
           }
 
           print(summary(checks))
-          cross_lines <- grep("^- :heavy_multiplication_x:", md, value = TRUE)
-          blocking_lines <- cross_lines[!grepl("Repository has no website$", cross_lines)]
-          if (length(blocking_lines) > 0L) {
+          checks_okay <- isTRUE(attr(md, "checks_okay"))
+          if (!checks_okay && website_check_failed) {
+            checks_ignoring_website <- checks
+            checks_ignoring_website$checks$repo_has_website <- TRUE
+            checks_okay <- isTRUE(
+              attr(
+                pkgcheck::checks_to_markdown(checks_ignoring_website, render = FALSE),
+                "checks_okay"
+              )
+            )
+          }
+          if (!checks_okay) {
             quit(status = 1, save = "no")
           }
-          if (length(cross_lines) > 0L) {
+          if (website_check_failed) {
             message(
               "Ignoring pkgcheck website check; it depends on repository homepage metadata."
             )
