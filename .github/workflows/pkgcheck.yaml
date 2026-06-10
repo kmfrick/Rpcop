@@ -105,8 +105,7 @@ jobs:
           checks_okay <- isTRUE(attr(md, "checks_okay"))
           ignore_repo_homepage_check <- website_check_failed &&
             pkgdown_url_reachable &&
-            length(failed_checks) == 1L &&
-            identical(failed_checks, "repo_has_website")
+            length(failed_checks) == 1L
           if (!checks_okay && ignore_repo_homepage_check) {
             checks_ignoring_website <- checks
             checks_ignoring_website$checks$repo_has_website <- TRUE
