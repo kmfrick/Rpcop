@@ -64,7 +64,11 @@ jobs:
           ))
 
           checks <- pkgcheck::pkgcheck(".", use_cache = FALSE)
-          website_check_failed <- !isTRUE(checks$checks$repo_has_website)
+          website_check_present <- "repo_has_website" %in% names(checks$checks)
+          website_check_failed <- website_check_present && !isTRUE(checks$checks$repo_has_website)
+          failed_checks <- names(checks$checks)[
+            vapply(checks$checks, function(x) !isTRUE(x), logical(1))
+          ]
           pkgdown_url <- ""
           if (file.exists("_pkgdown.yml")) {
             pkgdown_cfg <- readLines("_pkgdown.yml", warn = FALSE)
@@ -99,7 +103,10 @@ jobs:
 
           print(summary(checks))
           checks_okay <- isTRUE(attr(md, "checks_okay"))
-          ignore_repo_homepage_check <- website_check_failed && pkgdown_url_reachable
+          ignore_repo_homepage_check <- website_check_failed &&
+            pkgdown_url_reachable &&
+            length(failed_checks) == 1L &&
+            identical(failed_checks, "repo_has_website")
           if (!checks_okay && ignore_repo_homepage_check) {
             checks_ignoring_website <- checks
             checks_ignoring_website$checks$repo_has_website <- TRUE
