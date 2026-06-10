@@ -80,8 +80,15 @@ jobs:
           }
 
           print(summary(checks))
-          if (!isTRUE(attr(md, "checks_okay"))) {
+          cross_lines <- grep("^- :heavy_multiplication_x:", md, value = TRUE)
+          blocking_lines <- cross_lines[!grepl("Repository has no website$", cross_lines)]
+          if (length(blocking_lines) > 0L) {
             quit(status = 1, save = "no")
+          }
+          if (length(cross_lines) > 0L) {
+            message(
+              "Ignoring pkgcheck website check; it depends on repository homepage metadata."
+            )
           }
 
       - name: Upload pkgcheck artifacts
