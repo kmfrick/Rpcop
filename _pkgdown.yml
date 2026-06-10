@@ -13,3 +13,4 @@ reference:
 - title: Main interface
   contents:
   - pcop
+  - pcop-methods
