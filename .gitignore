@@ -6,6 +6,7 @@
 .RData
 .Ruserdata
 .Rproj.user/
+.Rprofile
 src/*.o
 src/*.so
 src/*.dll
@@ -13,3 +14,9 @@ src/*.dylib
 src/*.a
 src/*.obj
 src/*.exe
+
+rv/
+*.Rcheck
+.vagrant/
+rproject.toml
+rv.lock
