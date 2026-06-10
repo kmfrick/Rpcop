@@ -1,0 +1,15 @@
+url: https://kmfrick.github.io/Rpcop/
+template:
+  bootstrap: 5
+home:
+  title: Rpcop
+  description: Principal curves of oriented points in R.
+articles:
+- title: Guides
+  navbar: ~
+  contents:
+  - pcop
+reference:
+- title: Main interface
+  contents:
+  - pcop

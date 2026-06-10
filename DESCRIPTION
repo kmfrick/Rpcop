@@ -1,8 +1,8 @@
 Package: Rpcop
 Type: Package
 Title: Principal Curves of Oriented Points
-Version: 1.2.1
-Date: 2026-02-17
+Version: 1.2.2
+Date: 2026-06-10
 Authors@R:
     c(person(given = "Pedro",
              family = "Delicado",
@@ -25,12 +25,16 @@ Authors@R:
              role = "cph",
              comment = "Author of eigens() for symmetric matrix eigendecomposition"))
 Maintainer: Kevin Michael Frick <kmfrick@proton.me>
-Description: Principal curves generalize the notion of a first principal component to the case in which it is a non linear smooth curve. This package provides a function pcop(X) to compute principal curves with the algorithm defined in Delicado (2001) <doi:10.1006/jmva.2000.1917> from a data matrix X.
+Description: Principal curves generalize the notion of a first principal component to the case in which it is a nonlinear smooth curve. This package provides a function pcop(X) to compute principal curves with the algorithm defined in Delicado (2001) <doi:10.1006/jmva.2000.1917> from a data matrix X.
 License: GPL (>= 2)
 Depends: R (>= 3.5.0)
 Imports: Rcpp (>= 1.0.7), princurve
-Suggests: testthat (>= 3.0.0)
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
 LinkingTo: Rcpp
+VignetteBuilder: knitr
 Encoding: UTF-8
-RoxygenNote: 7.3.3
+Roxygen: list(markdown = TRUE, roclets = c("namespace", "rd", "srr::srr_stats_roclet"))
+URL: https://github.com/kmfrick/Rpcop
+BugReports: https://github.com/kmfrick/Rpcop/issues
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

@@ -5,7 +5,11 @@
 ^rv$
 ^rv\.lock$
 ^Rpcop\.Rcheck$
+^Rpcop_.*\.tar\.gz$
 ^src/Makevars$
 ^tools$
 ^Vagrantfile$
 ^2026-05-27-22-41-02\.037-VBoxHeadless-20715\.log$
+^_pkgdown\.yml$
+^CONTRIBUTING\.md$
+^vignettes/.*\.html$

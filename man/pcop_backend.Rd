@@ -17,6 +17,6 @@ pcop_backend(x, c_d, c_h)
 Numeric matrix consumed by \code{pcop()}.
 }
 \description{
-Internal backend used by \code{pcop()} to compute the principal curve defined in Delicado (2001) \doi{10.1007/s001800300145}.
+Internal backend used by \code{pcop()} to compute the principal curve defined in Delicado and Huerta (2003) \doi{10.1007/s001800300145}.
 }
 \keyword{internal}
