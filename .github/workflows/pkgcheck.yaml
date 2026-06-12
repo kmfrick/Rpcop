@@ -30,6 +30,60 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Wait for required CI workflows
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+
+          required_workflows=("R-CMD-check" "test-coverage.yaml")
+          deadline=$((SECONDS + 1800))
+
+          while true; do
+            runs=$(gh api \
+              "repos/${GITHUB_REPOSITORY}/actions/runs?event=push&head_sha=${TARGET_SHA}&per_page=100" \
+              --jq '.workflow_runs[] | [.name, .status, (.conclusion // "")] | @tsv')
+
+            all_success=true
+            for workflow in "${required_workflows[@]}"; do
+              row=$(printf '%s\n' "${runs}" | awk -F '\t' -v wf="${workflow}" '$1 == wf { print; exit }')
+              if [ -z "${row}" ]; then
+                echo "Waiting for ${workflow}: no run for ${TARGET_SHA} yet"
+                all_success=false
+                continue
+              fi
+
+              status=$(printf '%s\n' "${row}" | awk -F '\t' '{ print $2 }')
+              conclusion=$(printf '%s\n' "${row}" | awk -F '\t' '{ print $3 }')
+
+              if [ "${status}" = "completed" ] && [ "${conclusion}" = "success" ]; then
+                echo "${workflow}: success"
+                continue
+              fi
+
+              if [ "${status}" = "completed" ]; then
+                echo "${workflow}: completed with ${conclusion}"
+                exit 1
+              fi
+
+              echo "Waiting for ${workflow}: ${status}"
+              all_success=false
+            done
+
+            if [ "${all_success}" = true ]; then
+              break
+            fi
+
+            if [ "${SECONDS}" -ge "${deadline}" ]; then
+              echo "Timed out waiting for required CI workflows for ${TARGET_SHA}"
+              exit 1
+            fi
+
+            sleep 30
+          done
+
       - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
